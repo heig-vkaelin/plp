@@ -122,6 +122,7 @@ et p q = p && q
 
 -- Utilisez les listes en compréhension pour lister la
 -- table de vérité de vos fonctions or et and (sous forme de triplets).
+
 truthTableOr = [(x, y, z) | let r = [False, True], x <- r, y <- r, z <- [ou x y]]
 truthTableAnd = [(x, y, z) | let r = [False, True], x <- r, y <- r, z <- [et x y]]
 
@@ -134,21 +135,15 @@ truthTableAnd = [(x, y, z) | let r = [False, True], x <- r, y <- r, z <- [et x y
 -- Comment utiliser ces fonctions pour supprimer le mot Hello au début 
 -- d’une chaîne? Tester si la chaîne commence par Hello ?
 
--- version pattern matching:
--- deleteHello ('H':'e':'l':'l':'o':restOfString) = restOfString
--- deleteHello str = str
-
 deleteHello xs = if take 5 xs == "Hello" then drop 5 xs else xs
 
 -- ---------------------------
 -- Exercice 7
 -- ---------------------------
 
--- Je suis allergique à l’américain, écrivez une fonction clean s qui supprime
--- le mot Hello s’il figure au début de la chaîne s.
+-- Ecrivez une fonction clean s qui supprime le mot Hello s’il figure au début de la chaîne s.
 
--- La phrase résultante manque de majuscule, pouvez vous corriger ça? 
--- Utilisez toUpper du module Data.Char avec l’énoncé import Data.Char.
+-- La phrase résultante manque de majuscule, pouvez vous corriger ça?
 
 clean [] = []
 clean s =
@@ -208,7 +203,7 @@ concatList = listEx10 ++ secondList
 
 slice str i j = [str !! x | x <- [i..j]]
 
--- Définissez cette fonction de manière récursive.
+-- Version récursive:
 slice' str i j
   | i < 0 = slice str ((length str)+i) j 
   | j < 0 = slice str i ((length str)+j)
@@ -228,10 +223,6 @@ insert x n list = take (n - 1) list ++ [x] ++ drop (n - 1) list
 -- ---------------------------
 -- Exercice 13
 -- ---------------------------
-
--- Une méthode de calcul des nombres premiers consiste à énumérer tous les entiers 
--- et successivement supprimer de la liste les multiples des éléments restants.
--- C’est la méthode du crible d’Ératosthène.
 
 -- Écrivez une fonction sieve qui, à l’aide d’une expression de liste en compréhension, 
 -- supprime d’une liste xs tous les multiples de n :
@@ -261,14 +252,12 @@ prime n = [x | x <- [2..(n-1)], n `mod` x == 0] == []
 -- Exercice 15
 -- ---------------------------
 
--- La conjecture de Goldbach est l’assertion mathématique que tout 
--- nombre entier pair supérieur à 2 est la somme de deux nombres premiers.
-
 -- Écrivez une fonction parts, à l’aide d’une expression de liste en compréhension, 
 -- qui liste les paires de nombres premiers dont la somme est égale à n :
 
 -- Prelude > parts 14
 -- [(3,11), (7,7), (11,3)]
+
 parts n = [(x, y) | let values = [2..(n-1)], x <- values, y <- values, x + y == n, prime x, prime y]
 
 -- ---------------------------
@@ -301,6 +290,7 @@ prod (x1,x2,x3) (y1,y2,y3) = x1*y1 + x2*y2 + x3*y3
 -- ---------------------------
 
 -- Définir les fonctions head’ et tail’ à l’aide de motifs.
+
 head' [] = error "Liste vide"
 head' (x:_) = x
 tail' [] = error "Liste vide"
@@ -319,8 +309,6 @@ findFifthElem _ = error "Liste invalide"
 -- ---------------------------
 
 -- Définissez la fonction pgcd qui calcule le plus grand commun diviseur de deux nombres.
--- On se souvient qu’il suffit de retrancher successivement le plus petit du plus grand 
--- jusqu’à ce qu’ils soient identiques pour trouver ce pgcd.
 
 pgcd x y
   | x > y     = pgcd (x-y) y
@@ -333,9 +321,6 @@ pgcd x y
 
 -- Écrivez une fonction secToHMS qui transforme des secondes en heures, 
 -- minutes et secondes sans utiliser de division ni modulo.
-
--- Indication : ce problème n’est pas trivial, il faut retourner un résultat sous forme 
--- de triplet (h,m,s) et utiliser un let sur le reste pour exprimer le résultat final.
 
 secToHMS sec =
   let 
@@ -354,7 +339,7 @@ secToHMS sec =
 -- définissez une fonction pour calculer sa surface avec un where 
 -- comme pour l’exemple du cylindre donné dans les transparents du cours.
 
--- Triangle sur un carré
+-- Triangle au-dessus d'un carré
 maison cote hauteur = mur + toit
   where
     mur = cote * cote
@@ -363,9 +348,6 @@ maison cote hauteur = mur + toit
 -- ---------------------------
 -- Exercice 24
 -- ---------------------------
-
--- Une manière triviale de trier une liste est d’appliquer la méthode 
--- de tri par insertion : on insère successivement tous les éléments de la liste dans une liste triée.
 
 -- Écrivez une fonction qui trie par insertion une liste.
 
