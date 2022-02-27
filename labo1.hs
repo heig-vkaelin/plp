@@ -175,7 +175,7 @@ tuple n = (n^2, (n+1)^2, (n+2)^2)
 
 dataEx9 = [("Valentin", 24), ("Alex", 12), ("Bob", 69)]
 
-getAge nameToFind [] = -1
+getAge nameToFind [] = error "Nom introuvable"
 getAge nameToFind ((name,age):list) = if nameToFind == name then age else getAge nameToFind list
 
 -- ---------------------------
@@ -301,7 +301,9 @@ prod (x1,x2,x3) (y1,y2,y3) = x1*y1 + x2*y2 + x3*y3
 -- ---------------------------
 
 -- Définir les fonctions head’ et tail’ à l’aide de motifs.
+head' [] = error "Liste vide"
 head' (x:_) = x
+tail' [] = error "Liste vide"
 tail' (_:x) = x
 
 -- ---------------------------
@@ -310,7 +312,7 @@ tail' (_:x) = x
 
 -- Trouvez le cinquième élément d’une liste à l’aide d’un motif.
 findFifthElem (_:_:_:_:x:_) = x
-findFifthElem _ = -1
+findFifthElem _ = error "Liste invalide"
 
 -- ---------------------------
 -- Exercice 21
@@ -335,10 +337,14 @@ pgcd x y
 -- Indication : ce problème n’est pas trivial, il faut retourner un résultat sous forme 
 -- de triplet (h,m,s) et utiliser un let sur le reste pour exprimer le résultat final.
 
--- TODO
-secToHMS s
-  | s >= 60   = s
-  | otherwise = s 
+secToHMS sec =
+  let 
+    hms (h, m, s)
+      | s >= 3600 = hms (h + 1, m, s - 3600)
+      | s >= 60   = hms (h, m + 1, s - 60)
+      | otherwise = (h, m, s)
+  in
+    hms (0, 0, sec) 
 
 -- ---------------------------
 -- Exercice 23
