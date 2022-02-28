@@ -282,8 +282,22 @@ prod (x1,x2,x3) (y1,y2,y3) = x1*y1 + x2*y2 + x3*y3
 -- ---------------------------
 
 -- Récrivez les fonctions add et prod sur une liste à l’aide de motifs.
--- TODO: liste à la place des tuples ou liste de tuples ?
--- add [x1, x2] [y1, y2] = (x1 + y1, x2 + y2)
+
+add' xs =
+  case xs of 
+    [v1@(a, b), v2@(c, d)] -> add v1 v2
+    (v1@(a, b) : ys) -> add v1 (add' ys) 
+    _ -> (0, 0)
+
+prod' xs =
+  let
+    product [(a, b, c)] = (a, b, c)
+    product [(a, b, c), (d, e, f)] = (a * d, b * e, c * f)
+    product (v@(a, b, c) : ys) = product [v, product ys]
+    product [] = (0, 0, 0)
+    (a, b, c) = product xs
+  in
+    a + b + c
 
 -- ---------------------------
 -- Exercice 19
