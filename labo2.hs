@@ -109,32 +109,135 @@ twice f x = f (f x)
 -- Exercice 6
 -- ---------------------------
 
--- 1. Si le type de f est a -> a -> a -> a et le type de x est Char,
---  alors le type de f x est:
--- TODO: here
+-- 1. Si le type de f est a -> a -> a -> a et le type de x est Char, 
+-- alors le type de f x est:
 -- a. Char -> Char -> Char
--- b. x->x->x->x
--- c. a->a->a
--- d. a->a->a->Char
+
+-- 2. Si le type de g est a -> b -> c -> b, 
+-- alors le type de g 0 ’c’ "woot" est :
+-- d. Char
+
+-- 3. Si le type de h est (Num a, Num b) => a -> b -> b, 
+-- alors le type de h 1.0 2 est :
+-- d. Num b => b
+
+-- 4. Si le type de h est (Num a, Num b) => a -> b -> b, 
+-- alors le type de h 1 (5.5 :: Double) est :
+-- c. Double
+
+-- 5. Si le type de j est (Ord a, Eq b) => a -> b -> a, 
+-- alors le type de j "keyboard" "has the word jackal in it" est :
+-- a. [Char]
+
+-- 6. Si le type de j est (Ord a, Eq b) => a -> b -> a,
+-- alors le type de j "keyboard" est : 
+-- e. Eq b => b -> [Char]
+
+-- 7. Si le type de k est (Ord a, Num b) => a -> b -> a, 
+-- alors le type de k 1 2 est :
+-- d. (Num a, Ord a) => a
+
+-- 8. Si le type de k est (Ord a, Num b) => a -> b -> a, 
+-- alors le type de k 1 (2 :: Integer) est :
+-- a. (Num a, Ord a) => a
+
+-- 9. Si le type de k est (Ord a, Num b) => a -> b -> a,
+-- alors le type de k (1 :: Integer) 2 est : 
+-- c. Integer
 
 -- ---------------------------
 -- Exercice 7
 -- ---------------------------
 
+-- 1. Une valeur de type [a] est
+-- c. une liste où les éléments sont tous de type a
 
+-- 2. Une fonction de type [[a]] -> [a] peut
+-- a. prendre une liste de chaînes de caractères en argument
+
+-- 3. Une fonction de type [a] -> Int -> a 
+-- b. retourne un élément de type a de la liste
+
+-- 4. Une fonction de type (a, b) -> a
+-- c. prend un tuple en argument et retourne la première valeur
 
 -- ---------------------------
 -- Exercice 8
 -- ---------------------------
 
+-- 1. Sachant
+-- x = 5 
+-- y = x + 5
+-- w = y ∗ 10
+-- Quel est le type de w ? Num a => a
 
+-- 2. Sachant
+-- x = 5
+-- y = x + 5
+-- z y = y * 10
+-- Quel est le type de z ? Num a => a -> a
+
+-- 3. Sachant
+-- x = 5
+-- y = x + 5
+-- f = 4 / y
+-- Quel est le type de f ? Fractional a => a
+
+-- 4. Sachant
+-- x = "Julie"
+-- y = " <3 "
+-- z = " Haskell "
+-- f = x ++ y ++ z
+-- Quel est le type de f ? [Char]
+
+-- 5. Sachant
+-- x = 3.14
+-- y = x + 5
+-- z = show y
+-- Quel est le type de z ? String
 
 -- ---------------------------
 -- Exercice 9
 -- ---------------------------
 
+-- On souhaite modéliser des ensembles à travers des listes Haskell. 
+-- Décrivez les signatures des fonctions de manipulation d’ensembles suivantes
+-- et donnez leurs implémentations.
+
+-- TODO
+
+-- Insertion d’un élément x
+
+
+-- Suppression d'un élément x
+
+
+-- Appartenance d'un élément x
+
+
+-- Union de deux ensembles s1 et s2
+
+
+-- Différence de deux ensembles s1 et s2 
 
 
 -- ---------------------------
 -- Exercice 10
 -- ---------------------------
+
+-- Inférez le type des fonctions d et d'.
+
+-- TODO
+
+d (v, e) n
+  | null []   = []
+  | otherwise = d' (v, e) [n]
+
+d' ([], _) _ = []
+d' (_, _) [] = []
+d' (v, e) (t:r)
+  | [x | x <- v, x == t] == [] = d' (n, e) r
+  | otherwise = t : d' (n, e) (a ++ r)
+  where
+    a = [x | (x, y) <- e, y == t] ++ [x | (y, x) <- e, y == t]
+    n = [x | x <- v, x /= t]
