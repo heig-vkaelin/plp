@@ -126,6 +126,13 @@ et p q = p && q
 truthTableOr = [(x, y, z) | let r = [False, True], x <- r, y <- r, z <- [ou x y]]
 truthTableAnd = [(x, y, z) | let r = [False, True], x <- r, y <- r, z <- [et x y]]
 
+-- Corrigé:
+truthOr =
+  let
+    xs = [False, True]
+  in
+    [(p, q, ou p q) | p <- xs, q <- xs]
+
 -- ---------------------------
 -- Exercice 6
 -- ---------------------------
@@ -246,7 +253,7 @@ sieve n xs = [x | x <- xs, x `mod` n /= 0]
 
 prime 1 = False
 prime 2 = False
-prime n = [x | x <- [2..(n-1)], n `mod` x == 0] == []
+prime n = null [x | x <- [2 .. n - 1], n `mod` x == 0]
 
 -- ---------------------------
 -- Exercice 15
@@ -344,6 +351,12 @@ secToHMS sec =
       | otherwise = (h, m, s)
   in
     hms (0, 0, sec) 
+
+-- Corrigé
+secToHMSV2 sec
+  | sec >= 3600 = let (h , m, s) = secToHMS (sec - 3600) in (h + 1 , m, s)
+  | sec >= 60 = let (h , m, s) = secToHMS (sec - 60) in (h, m + 1, s)
+  | otherwise = (0 , 0, sec)
 
 -- ---------------------------
 -- Exercice 23
