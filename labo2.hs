@@ -204,22 +204,41 @@ twice f x = f (f x)
 -- Décrivez les signatures des fonctions de manipulation d’ensembles suivantes
 -- et donnez leurs implémentations.
 
--- TODO
-
 -- Insertion d’un élément x
-
+insert :: Eq a => a -> [a] -> [a]
+insert x xs 
+  | exist x xs = xs
+  | otherwise  = x : xs
 
 -- Suppression d'un élément x
-
+delete :: Eq a => a -> [a] -> [a]
+delete _ [] = []
+delete x (y:ys)
+  | x == y    = delete x ys
+  | otherwise = y : delete x ys
 
 -- Appartenance d'un élément x
-
+exist :: Eq a => a -> [a] -> Bool 
+exist _ [] = False
+exist x (y:ys)
+  | x == y    = True
+  | otherwise = exist x ys
 
 -- Union de deux ensembles s1 et s2
+union :: Eq a => [a] -> [a] -> [a]
+union xs [] = xs
+union [] ys = ys
+union xs (y:ys)
+  | exist y xs = union xs ys
+  | otherwise  = y : union xs ys
 
-
--- Différence de deux ensembles s1 et s2 
-
+-- Différence de deux ensembles s1 et s2
+diff :: Eq a => [a] -> [a] -> [a]
+diff xs [] = xs
+diff [] ys = []
+diff xs (y:ys)
+  | exist y xs = diff (delete y xs) ys
+  | otherwise  = diff xs ys
 
 -- ---------------------------
 -- Exercice 10
