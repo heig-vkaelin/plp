@@ -248,10 +248,12 @@ diff xs (y:ys)
 
 -- TODO
 
+d :: Eq a => ([a], [(a, a)]) -> a -> [a]
 d (v, e) n
   | null []   = []
   | otherwise = d' (v, e) [n]
 
+d' :: Eq a => ([a], [(a, a)]) -> [a] -> [a]
 d' ([], _) _ = []
 d' (_, _) [] = []
 d' (v, e) (t:r)
