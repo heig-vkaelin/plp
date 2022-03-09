@@ -246,8 +246,6 @@ diff xs (y:ys)
 
 -- Inférez le type des fonctions d et d'.
 
--- TODO
-
 d :: Eq a => ([a], [(a, a)]) -> a -> [a]
 d (v, e) n
   | null []   = []
