@@ -74,7 +74,7 @@ swap :: (a, b) -> (b, a)
 swap (x, y) = (y, x)
 
 pair :: a -> b -> (a, b)
-pair x y = (x, y) 
+pair x y = (x, y)
 
 double :: Num a => a -> a
 double x = x * 2
@@ -91,58 +91,58 @@ twice f x = f (f x)
 
 -- Faites correspondre chaque fonction à sa signature de type.
 
--- Fonctions : 
+-- Fonctions :
 -- a. not     -> 5.
 -- b. length  -> 3.
 -- c. concat  -> 2.
 -- d. head    -> 1.
 -- e. (<)     -> 4.
 
--- Signatures de type : 
+-- Signatures de type :
 -- 1. _ :: [a] -> a
 -- 2. _ :: [[a]] -> [a]
 -- 3. _ :: [a] -> Int
--- 4. _ :: Ord a => a -> a -> Bool 
+-- 4. _ :: Ord a => a -> a -> Bool
 -- 5. _ :: Bool -> Bool
 
 -- ---------------------------
 -- Exercice 6
 -- ---------------------------
 
--- 1. Si le type de f est a -> a -> a -> a et le type de x est Char, 
+-- 1. Si le type de f est a -> a -> a -> a et le type de x est Char,
 -- alors le type de f x est:
 -- a. Char -> Char -> Char
 
--- 2. Si le type de g est a -> b -> c -> b, 
+-- 2. Si le type de g est a -> b -> c -> b,
 -- alors le type de g 0 ’c’ "woot" est :
 -- d. Char
 
--- 3. Si le type de h est (Num a, Num b) => a -> b -> b, 
+-- 3. Si le type de h est (Num a, Num b) => a -> b -> b,
 -- alors le type de h 1.0 2 est :
--- d. Num b => b
+-- b. Integer
 
--- 4. Si le type de h est (Num a, Num b) => a -> b -> b, 
+-- 4. Si le type de h est (Num a, Num b) => a -> b -> b,
 -- alors le type de h 1 (5.5 :: Double) est :
 -- c. Double
 
--- 5. Si le type de j est (Ord a, Eq b) => a -> b -> a, 
+-- 5. Si le type de j est (Ord a, Eq b) => a -> b -> a,
 -- alors le type de j "keyboard" "has the word jackal in it" est :
 -- a. [Char]
 
 -- 6. Si le type de j est (Ord a, Eq b) => a -> b -> a,
--- alors le type de j "keyboard" est : 
+-- alors le type de j "keyboard" est :
 -- e. Eq b => b -> [Char]
 
--- 7. Si le type de k est (Ord a, Num b) => a -> b -> a, 
+-- 7. Si le type de k est (Ord a, Num b) => a -> b -> a,
 -- alors le type de k 1 2 est :
--- d. (Num a, Ord a) => a
+-- a. Integer
 
--- 8. Si le type de k est (Ord a, Num b) => a -> b -> a, 
+-- 8. Si le type de k est (Ord a, Num b) => a -> b -> a,
 -- alors le type de k 1 (2 :: Integer) est :
--- a. (Num a, Ord a) => a
+-- f. Integer
 
 -- 9. Si le type de k est (Ord a, Num b) => a -> b -> a,
--- alors le type de k (1 :: Integer) 2 est : 
+-- alors le type de k (1 :: Integer) 2 est :
 -- c. Integer
 
 -- ---------------------------
@@ -155,7 +155,7 @@ twice f x = f (f x)
 -- 2. Une fonction de type [[a]] -> [a] peut
 -- a. prendre une liste de chaînes de caractères en argument
 
--- 3. Une fonction de type [a] -> Int -> a 
+-- 3. Une fonction de type [a] -> Int -> a
 -- b. retourne un élément de type a de la liste
 
 -- 4. Une fonction de type (a, b) -> a
@@ -166,10 +166,10 @@ twice f x = f (f x)
 -- ---------------------------
 
 -- 1. Sachant
--- x = 5 
+-- x = 5
 -- y = x + 5
--- w = y ∗ 10
--- Quel est le type de w ? Num a => a
+-- w = y * 10
+-- Quel est le type de w ? Integer
 
 -- 2. Sachant
 -- x = 5
@@ -181,7 +181,7 @@ twice f x = f (f x)
 -- x = 5
 -- y = x + 5
 -- f = 4 / y
--- Quel est le type de f ? Fractional a => a
+-- Quel est le type de f ? Double
 
 -- 4. Sachant
 -- x = "Julie"
@@ -200,45 +200,62 @@ twice f x = f (f x)
 -- Exercice 9
 -- ---------------------------
 
--- On souhaite modéliser des ensembles à travers des listes Haskell. 
+-- On souhaite modéliser des ensembles à travers des listes Haskell.
 -- Décrivez les signatures des fonctions de manipulation d’ensembles suivantes
 -- et donnez leurs implémentations.
 
 -- Insertion d’un élément x
-insert :: Eq a => a -> [a] -> [a]
-insert x xs 
-  | exist x xs = xs
-  | otherwise  = x : xs
+insert :: Ord a => a -> [a] -> [a]
+insert y [] = [y]
+insert y l@(x : xs)
+  | x < y = x : insert y xs
+  | x == y = l
+  | otherwise = y : l
 
 -- Suppression d'un élément x
-delete :: Eq a => a -> [a] -> [a]
+delete :: Ord a => a -> [a] -> [a]
 delete _ [] = []
-delete x (y:ys)
-  | x == y    = delete x ys
-  | otherwise = y : delete x ys
+delete y l@(x : xs)
+  | x < y = x : delete y xs
+  | x == y = xs
+  | otherwise = l
 
 -- Appartenance d'un élément x
-exist :: Eq a => a -> [a] -> Bool 
+exist :: Eq a => a -> [a] -> Bool
 exist _ [] = False
-exist x (y:ys)
-  | x == y    = True
+exist x (y : ys)
+  | x == y = True
   | otherwise = exist x ys
 
 -- Union de deux ensembles s1 et s2
 union :: Eq a => [a] -> [a] -> [a]
 union xs [] = xs
 union [] ys = ys
-union xs (y:ys)
+union xs (y : ys)
   | exist y xs = union xs ys
-  | otherwise  = y : union xs ys
+  | otherwise = y : union xs ys
+
+-- Version du prof
+union_v2 :: Ord a => [a] -> [a] -> [a]
+union_v2 [] ys = ys
+union_v2 (x : xs) ys = union_v2 xs (insert x ys)
 
 -- Différence de deux ensembles s1 et s2
-diff :: Eq a => [a] -> [a] -> [a]
+diff :: Ord a => [a] -> [a] -> [a]
 diff xs [] = xs
 diff [] ys = []
-diff xs (y:ys)
+diff xs (y : ys)
   | exist y xs = diff (delete y xs) ys
-  | otherwise  = diff xs ys
+  | otherwise = diff xs ys
+
+-- Intersection de deux ensembles s1 et s2
+intersect :: Ord a => [a] -> [a] -> [a]
+intersect [] _ = []
+intersect _ [] = []
+intersect l1@(x : xs) l2@(y : ys)
+  | x < y = intersect xs l2
+  | x == y = x : intersect xs ys
+  | otherwise = intersect l1 ys
 
 -- ---------------------------
 -- Exercice 10
@@ -248,13 +265,13 @@ diff xs (y:ys)
 
 d :: Eq a => ([a], [(a, a)]) -> a -> [a]
 d (v, e) n
-  | null []   = []
+  | null [] = []
   | otherwise = d' (v, e) [n]
 
 d' :: Eq a => ([a], [(a, a)]) -> [a] -> [a]
 d' ([], _) _ = []
 d' (_, _) [] = []
-d' (v, e) (t:r)
+d' (v, e) (t : r)
   | [x | x <- v, x == t] == [] = d' (n, e) r
   | otherwise = t : d' (n, e) (a ++ r)
   where
