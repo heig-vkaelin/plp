@@ -1,4 +1,4 @@
--- 1. Haskell / Type system
+-- 2. Haskell / Type system
 -- 04.03.2022
 
 {-
