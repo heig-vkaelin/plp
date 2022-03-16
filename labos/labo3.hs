@@ -190,12 +190,12 @@ tous' f = foldr ((&&) . f) True
 -- Quelle est la longueur de la chaîne de Collatz de 156159 ? 383
 
 collatz n
-  | even n    = n `div` 2
+  | even n = n `div` 2
   | otherwise = n * 3 + 1
 
 collatzList n
-  | n <= 0    = error "n must be positive"
-  | n == 1    = [1]
+  | n <= 0 = error "n must be positive"
+  | n == 1 = [1]
   | otherwise = n : collatzList (collatz n)
 
 -- ---------------------------
@@ -210,3 +210,32 @@ collatzList n
 -- Comparer les performances de ces deux solutions.
 
 -- Challenge : Appliquer le principe de la mémoïsation au calcul de la fonction d'Ackermann.
+
+-- Afficher le temps d'exécution dans ghci -> :set +s
+
+-- Avec memoization
+-- fib 100 -> 0.00s
+-- fib 10'000 -> 0.37s
+fib = (map fib' [0 ..] !!)
+  where
+    fib' 0 = 0
+    fib' 1 = 1
+    fib' 2 = 1
+    fib' n = fib (n - 2) + fib (n - 1)
+
+-- Sans memoization
+-- fib'' 30 -> 1.46s
+-- fib'' 35 -> 16.73s (pas fait +)
+fib'' n = map fib''' [0 ..] !! n
+  where
+    fib''' 0 = 0
+    fib''' 1 = 1
+    fib''' 2 = 1
+    fib''' n = fib'' (n - 2) + fib'' (n - 1)
+
+-- Version qui retourne le tableau
+-- fib'''' = zipWith (+) (0 : (1 : fib'''')) (1 : fib'''')
+
+-- Source: https://stackoverflow.com/questions/11466284/how-is-this-fibonacci-function-memoized
+
+-- J'ai pas tout capté $ cette question je l'avoue
