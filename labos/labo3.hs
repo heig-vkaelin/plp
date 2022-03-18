@@ -65,6 +65,8 @@ listes' = map (: []) -- <=> (\x -> x : [])
 
 carres = map (^ 2)
 
+carres' xs = map (\x -> x ^ 2) xs -- version longue
+
 -- ---------------------------
 -- Exercice 6
 -- ---------------------------
@@ -72,8 +74,9 @@ carres = map (^ 2)
 -- Écrire la fonction précédente sans fonction auxiliaire
 -- (utiliser l'opérateur qui élève à la puissance et flip).
 
-carres' [] = []
-carres' (x : xs) = flip (^) 2 x : carres' xs
+carres'' xs = map (flip (^) 2) xs
+
+carres''' xs = map (^ 2) xs
 
 -- ---------------------------
 -- Exercice 7
@@ -108,6 +111,8 @@ substring = map (take 5)
 minuscules [] = []
 minuscules (head : tail) = toUpper head : map toLower tail
 
+minuscules' xs = head xs : map toLower (tail xs)
+
 -- ---------------------------
 -- Exercice 10
 -- ---------------------------
@@ -138,7 +143,9 @@ smallerThan x = filter (< x)
 -- Prelude > cherche (>3) [1, 2, 3, 4, 5, 6]
 -- 4
 
-cherche f xs = head (filter f xs)
+cherche f xs = head $ filter f xs
+
+cherche' xs = head . filter xs
 
 -- ---------------------------
 -- Exercice 13
@@ -149,7 +156,7 @@ cherche f xs = head (filter f xs)
 
 -- existe :: ... => [t] -> (t -> Bool) -> Bool
 
-existe f = foldr ((||) . f) False
+existe p xs = foldl (\r x -> r || p x) False xs
 
 -- ---------------------------
 -- Exercice 14
@@ -160,9 +167,12 @@ existe f = foldr ((||) . f) False
 
 -- tous :: ... => [t] -> (t -> Bool) -> Bool
 
-tous f xs = foldr (&&) True (map f xs)
+tousSansFold p [] = True
+tousSansFold p (x : xs)
+  | p x = tous p xs
+  | otherwise = False
 
-tous' f = foldr ((&&) . f) True
+tous p xs = foldl (\acc x -> acc && p x) True xs
 
 -- ---------------------------
 -- Exercice 15
@@ -172,7 +182,11 @@ tous' f = foldr ((&&) . f) True
 -- exercices sans définir de fonction auxiliaire pour le pliage,
 -- en utilisant map pour transformer la liste [t] en [Bool].
 
--- Déjà fait ?
+existe' f = foldr ((||) . f) False
+
+tous' xs f = foldl (&&) True (map f xs)
+tous'' f = foldr ((&&) . f) True
+
 
 -- ---------------------------
 -- Exercice 16
@@ -198,6 +212,11 @@ collatzList n
   | n == 1 = [1]
   | otherwise = n : collatzList (collatz n)
 
+collatz' 1 = [1]
+collatz' n
+  | odd n = n : collatz' (3 * n + 1)
+  | otherwise = n : collatz' (n `div` 2)
+
 -- ---------------------------
 -- Exercice 17
 -- ---------------------------
@@ -220,7 +239,6 @@ fib = (map fib' [0 ..] !!)
   where
     fib' 0 = 0
     fib' 1 = 1
-    fib' 2 = 1
     fib' n = fib (n - 2) + fib (n - 1)
 
 -- Sans memoization
@@ -230,12 +248,7 @@ fib'' n = map fib''' [0 ..] !! n
   where
     fib''' 0 = 0
     fib''' 1 = 1
-    fib''' 2 = 1
     fib''' n = fib'' (n - 2) + fib'' (n - 1)
 
 -- Version qui retourne le tableau
 -- fib'''' = zipWith (+) (0 : (1 : fib'''')) (1 : fib'''')
-
--- Source: https://stackoverflow.com/questions/11466284/how-is-this-fibonacci-function-memoized
-
--- J'ai pas tout capté $ cette question je l'avoue
