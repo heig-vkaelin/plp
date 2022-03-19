@@ -2,7 +2,7 @@
 -- Exercice 1
 -- ---------------------------
 
-module GestionPersonnes where
+module Personne where
 
 import Data.Char (toUpper)
 
