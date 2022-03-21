@@ -8,3 +8,5 @@
 
 -- Écrivez une fonction qui applique l’algorithme de RLE :
 -- rle :: ... => [t] -> [(Int, t)]
+
+-- TODO
