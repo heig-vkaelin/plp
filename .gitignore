@@ -1,0 +1,11 @@
+# Enlever les fichiers sans extensions (exécutables)
+*
+!/**/
+!*.*
+
+# Fichiers du compilateur
+*.hi
+*.o
+
+# MacOS
+.DS_STORE
