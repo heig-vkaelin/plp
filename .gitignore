@@ -6,6 +6,7 @@
 # Fichiers du compilateur
 *.hi
 *.o
+*.exe
 
 # MacOS
 .DS_STORE

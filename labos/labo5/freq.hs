@@ -1,8 +1,15 @@
+import Data.List
 import System.Environment
 
 -- ---------------------------
 -- Exercice 3
 -- ---------------------------
+
+getFreq :: [Char] -> [([Char], Int)]
+getFreq = map (\x -> ([head x], length x)) . group . sort
+
+printFreq :: Foldable t => t ([Char], Int) -> [Char]
+printFreq = foldl (\acc (value, nb) -> acc ++ value ++ " " ++ replicate nb '*' ++ "\n") ""
 
 usage = putStrLn "Usage: freq <String>"
 
@@ -13,7 +20,6 @@ main =
     if length args /= 1
       then usage
       else do
-        putStrLn "TODO"
-
--- contents <- rFeadFile $ head args
--- putStrLn $ encode contents
+        let input = head args
+            freq = getFreq input
+        writeFile input $ printFreq freq
