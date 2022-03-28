@@ -51,3 +51,12 @@ toRoman nb
     toRoman' nb list@((k, v) : rest)
       | nb >= k = v ++ toRoman' (nb - k) list
       | otherwise = toRoman' nb rest
+
+-- TODO: remove when finished
+verifyRoman :: Int -> IO ()
+verifyRoman n
+  | n > 3999 = putStrLn "FINITO ALL GOOD"
+  | n == fromRoman (toRoman n) = do
+    putStrLn $ show n ++ " OK"
+    verifyRoman $ n + 1
+  | otherwise = putStrLn $ "ERREUR, nombre " ++ show n
