@@ -1,7 +1,8 @@
-module Roman where
-
-import Control.Monad (when)
-import Data.List (genericReplicate)
+module Roman
+  ( toRoman,
+    fromRoman,
+  )
+where
 
 toRomanMap :: [(Int, [Char])]
 toRomanMap =
@@ -24,9 +25,20 @@ toRomanMap =
 maxValue :: Int
 maxValue = 3999
 
--- TODO
+-- TODO: gestion des erreurs dans le fromRoman + check validité du nombre romain ??
+
+-- TODO: clean this
+getRomanDecimal :: Char -> Int
+getRomanDecimal x = fst $ head $ filter (\(_, v) -> v == [x]) toRomanMap
+
+-- TODO: clean this
 fromRoman :: [Char] -> Int
-fromRoman x = 0
+fromRoman (x : y : rest) =
+  let xValue = getRomanDecimal x
+      yValue = getRomanDecimal y
+      sign = if xValue < yValue then -1 else 1
+   in sign * xValue + fromRoman (y : rest)
+fromRoman x = getRomanDecimal $ head x
 
 toRoman :: Int -> [Char]
 toRoman nb
