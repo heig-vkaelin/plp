@@ -55,7 +55,7 @@ toRoman nb
 -- TODO: remove when finished
 verifyRoman :: Int -> IO ()
 verifyRoman n
-  | n > 3999 = putStrLn "FINITO ALL GOOD"
+  | n > maxValue = putStrLn "FINITO ALL GOOD"
   | n == fromRoman (toRoman n) = do
     putStrLn $ show n ++ " OK"
     verifyRoman $ n + 1
