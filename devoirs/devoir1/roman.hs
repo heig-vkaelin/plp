@@ -24,7 +24,7 @@ toRomanMap =
     (1, "I")
   ]
 
-romanValue :: Num p => Char -> p
+romanValue :: Char -> Int
 romanValue 'I' = 1
 romanValue 'V' = 5
 romanValue 'X' = 10
@@ -32,7 +32,7 @@ romanValue 'L' = 50
 romanValue 'C' = 100
 romanValue 'D' = 500
 romanValue 'M' = 1000
-romanValue _ = 0 -- afin d'éviter le warning, pas censé arriver
+romanValue _ = 0 -- afin d'éviter le warning, pas censé arriver dans ce cas
 
 -- Valeur maximale pour les différentes conversions
 maxValue :: Int
@@ -41,13 +41,12 @@ maxValue = 3999
 fromRoman :: [Char] -> Int
 fromRoman roman = if verified then result else error "Nombre romain incorrect."
   where
-    result = romanDigitSum $ map romanValue roman
+    result = romanDigitSum 0 $ map romanValue roman
     verified = toRoman result == roman
-    romanDigitSum [] = 0
-    romanDigitSum [z] = z
-    romanDigitSum (x : y : rest) =
-      let sign = if x < y then -1 else 1
-       in sign * x + romanDigitSum (y : rest)
+    romanDigitSum acc [] = acc
+    romanDigitSum acc [z] = acc + z
+    romanDigitSum acc (x : y : rest) =
+      romanDigitSum (if x < y then acc - x else acc + x) (y : rest)
 
 toRoman :: Int -> [Char]
 toRoman nb
