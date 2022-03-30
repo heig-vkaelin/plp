@@ -4,6 +4,9 @@ module Roman
   )
 where
 
+-- TODO: check si on peut use ça au lieu de []
+-- import Data.List.NonEmpty (NonEmpty)
+
 toRomanMap :: [(Int, [Char])]
 toRomanMap =
   [ (1000, "M"),
@@ -21,24 +24,30 @@ toRomanMap =
     (1, "I")
   ]
 
+romanValue :: Num p => Char -> p
+romanValue 'I' = 1
+romanValue 'V' = 5
+romanValue 'X' = 10
+romanValue 'L' = 50
+romanValue 'C' = 100
+romanValue 'D' = 500
+romanValue 'M' = 1000
+romanValue _ = 0 -- afin d'éviter le warning, pas censé arriver
+
 -- Valeur maximale pour les différentes conversions
 maxValue :: Int
 maxValue = 3999
 
--- TODO: gestion des erreurs dans le fromRoman + check validité du nombre romain ??
-
--- TODO: clean this
-getRomanDecimal :: Char -> Int
-getRomanDecimal x = fst $ head $ filter (\(_, v) -> v == [x]) toRomanMap
-
--- TODO: clean this
 fromRoman :: [Char] -> Int
-fromRoman (x : y : rest) =
-  let xValue = getRomanDecimal x
-      yValue = getRomanDecimal y
-      sign = if xValue < yValue then -1 else 1
-   in sign * xValue + fromRoman (y : rest)
-fromRoman x = getRomanDecimal $ head x
+fromRoman roman = if verified then result else error "Nombre romain incorrect."
+  where
+    result = romanDigitSum $ map romanValue roman
+    verified = toRoman result == roman
+    romanDigitSum [] = 0
+    romanDigitSum [z] = z
+    romanDigitSum (x : y : rest) =
+      let sign = if x < y then -1 else 1
+       in sign * x + romanDigitSum (y : rest)
 
 toRoman :: Int -> [Char]
 toRoman nb
