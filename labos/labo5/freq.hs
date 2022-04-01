@@ -1,9 +1,9 @@
-import Data.List
-import System.Environment
-
 -- ---------------------------
 -- Exercice 3
 -- ---------------------------
+
+import Data.List
+import System.Environment
 
 getFreq :: [Char] -> [([Char], Int)]
 getFreq = map (\x -> ([head x], length x)) . group . sort
