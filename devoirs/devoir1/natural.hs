@@ -94,7 +94,7 @@ gte x y = eq x y || gt x y
 fromInt :: (Num t, Ord t) => t -> Nat
 fromInt 0 = Z
 fromInt x
-  | x < 0 = Z
+  | x <= 0 = Z
   | otherwise = S $ fromInt $ x - 1
 
 toInt :: Num p => Nat -> p
