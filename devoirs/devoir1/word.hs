@@ -21,8 +21,8 @@ getNumber (a, b, c) (x : xs) = do
   showLine x current
   getNumber (addTupleOfThree (a, b, c) current) xs
 
-showLine name (a, b, c) = printf "%-10s %-6d %-6d %-6d\n" name a b c
-showTitleLine a b c d = printf "%-10s %6s %6s %6s\n" a b c d
+showLine name (a, b, c) = printf "%-10s %7d %7d %7d\n" name a b c
+showTitleLine a b c d = printf "%-10s %7s %7s %7s\n" a b c d
 
 addTupleOfThree (a, b, c) (d, e, f) = (a + d, b + e, c + f)
 
