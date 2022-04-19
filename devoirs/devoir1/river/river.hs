@@ -5,27 +5,44 @@ import Data.String
 data Passenger = Cabbage | Goat | Wolf | Fisherman
 
 instance Show Passenger where 
-    show Cabbage = "choux"
-    show Goat = "chevre"
-    show Wolf = "loup"
-    show Fisherman = "pecheur"
+    show Cabbage = "Choux"
+    show Goat = "Chevre"
+    show Wolf = "Loup"
+    show Fisherman = "Pecheur"
 
 data BoatSide = LeftSide | RightSide
 
 instance Show BoatSide where
-    show LeftSide  = " |<__> ~ ~ ~ riviere ~ ~ ~     | "
-    show RightSide = " |     ~ ~ ~ riviere ~ ~ ~ <__>| "
+    -- show LeftSide  = " |<__> ~ ~ ~ riviere ~ ~ ~     | "
+    -- show RightSide = " |     ~ ~ ~ riviere ~ ~ ~ <__>| "
+    show LeftSide  = "gauche"
+    show RightSide = "droite"
+
+data Boat = Boat{
+    side :: BoatSide,
+    passengers :: [Passenger]
+}
+
+instance Show Boat where
+    show (Boat side pass) = "Rive " ++ show side ++ " et contient: " ++ displayList pass
+
 
 data State = State {
     leftPpl  :: [Passenger],
-    bSide    :: BoatSide, 
+    boat    :: Boat, 
     rightPpl :: [Passenger] 
 }
 
 instance Show State where
-    show (State lxs bSide rxs) = displayList lxs ++ show bSide ++ displayList rxs
+    show (State lxs boat rxs) = 
+        do 
+            printf "%13s" "Rive gauche: " ++ displayList lxs ++ "\n" 
+            ++ printf "%13s" "Bateau: " ++ show boat ++ "\n" 
+            ++ printf "%13s" "Rive droite: " ++ displayList rxs
 
-startingState = State [Wolf, Goat, Cabbage, Fisherman] LeftSide []
+startingState = State [Wolf, Goat, Cabbage, Fisherman] (Boat LeftSide []) []
+test = State [Wolf, Cabbage] (Boat RightSide [Goat, Fisherman]) []
+test2 = State [Wolf, Cabbage] (Boat RightSide []) [Goat, Fisherman]
 
 main = getInput
 
@@ -40,7 +57,7 @@ getInput = do
                 getInput
 
 checkInput input
-    | input == ":p" = print startingState
+    | input == ":p" = print test2
     | fromString ":l" `isInfixOf` fromString input = putStrLn "Load"
     | input == ":u" = putStrLn "Unload"
     | input == ":m" = putStrLn "Move"
@@ -49,7 +66,7 @@ checkInput input
     | input == ":h" = help 
     | otherwise = putStrLn "Input invalide"
 
-displayList [] = ""
+displayList [] = "[]"
 displayList (x:xs)
  | null xs = show x
  | otherwise = show x ++ " " ++ displayList xs
