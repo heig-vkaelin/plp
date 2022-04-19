@@ -38,6 +38,7 @@ instance Show State where
             printf "%13s" "Rive gauche: " ++ displayList lxs ++ "\n" 
             ++ printf "%13s" "Bateau: " ++ show boat ++ "\n" 
             ++ printf "%13s" "Rive droite: " ++ displayList rxs
+            ++ "\n---------------------------------------------------------------------------------"
 
 startingState = State [Wolf, Goat, Cabbage, Fisherman] (Boat LeftSide []) []
 test = State [Wolf, Cabbage] (Boat RightSide [Goat, Fisherman]) []
@@ -72,7 +73,7 @@ move state = State (leftPpl state) (changeSide (boat state)) (rightPpl state)
 
 changeSide boat
     | side boat == LeftSide = Boat RightSide (passengers boat) 
-    | otherwise =Boat LeftSide (passengers boat)
+    | otherwise = Boat LeftSide (passengers boat)
 
 unload state
     | null (passengers (boat state)) = state
