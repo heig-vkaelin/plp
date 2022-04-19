@@ -10,7 +10,7 @@ instance Show Passenger where
     show Wolf = "Loup"
     show Fisherman = "Pecheur"
 
-data BoatSide = LeftSide | RightSide
+data BoatSide = LeftSide | RightSide deriving (Eq)
 
 instance Show BoatSide where
     -- show LeftSide  = " |<__> ~ ~ ~ riviere ~ ~ ~     | "
@@ -25,7 +25,6 @@ data Boat = Boat{
 
 instance Show Boat where
     show (Boat side pass) = "Rive " ++ show side ++ " et contient: " ++ displayList pass
-
 
 data State = State {
     leftPpl  :: [Passenger],
@@ -44,27 +43,42 @@ startingState = State [Wolf, Goat, Cabbage, Fisherman] (Boat LeftSide []) []
 test = State [Wolf, Cabbage] (Boat RightSide [Goat, Fisherman]) []
 test2 = State [Wolf, Cabbage] (Boat RightSide []) [Goat, Fisherman]
 
-main = getInput
+main = getInput test
 
-getInput = do
+getInput :: State -> IO ()
+getInput state = do
     s <- getLine
     -- Le check ferait plus de sens dans la méthode checkInput mais ça duplique le "getInput" partout sauf pour ":q"
     if s == ":q" 
-        then putStrLn "Au revoir !" 
+        then putStrLn "Au revoir"
         else 
             do 
-                checkInput s
-                getInput
+                let current = checkInput s state
+                print current
+                getInput current
+                
 
-checkInput input
-    | input == ":p" = print test2
-    | fromString ":l" `isInfixOf` fromString input = putStrLn "Load"
-    | input == ":u" = putStrLn "Unload"
-    | input == ":m" = putStrLn "Move"
-    | input == ":r" = putStrLn "Reset"
-    | input == ":q" = putStrLn "Au revoir !"
-    | input == ":h" = help 
-    | otherwise = putStrLn "Input invalide"
+checkInput input state
+     | input == ":p" = state
+--     | fromString ":l" `isInfixOf` fromString input = putStrLn "Load"
+     | input == ":u" = unload state
+     | input == ":m" = move state
+     | input == ":r" = startingState
+--     | input == ":h" = help 
+     | otherwise = error "Input invalide"
+
+move :: State -> State
+move state = State (leftPpl state) (changeSide (boat state)) (rightPpl state)
+
+changeSide boat
+    | side boat == LeftSide = Boat RightSide (passengers boat) 
+    | otherwise =Boat LeftSide (passengers boat)
+
+unload state
+    | null (passengers (boat state)) = state
+    | side (boat state) == LeftSide = State (leftPpl state ++ passengers b) (Boat (side b) []) (rightPpl state)
+    | otherwise = State (leftPpl state) (Boat (side b) []) (rightPpl state ++ passengers b)
+    where b = boat state
 
 displayList [] = "[]"
 displayList (x:xs)
