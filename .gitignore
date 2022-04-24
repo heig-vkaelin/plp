@@ -10,3 +10,6 @@
 
 # MacOS
 .DS_STORE
+
+# Fichiers de tests JSON
+*.json
