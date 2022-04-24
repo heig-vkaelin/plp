@@ -4,9 +4,6 @@ module Roman
   )
 where
 
--- TODO: check si on peut use ça au lieu de []
--- import Data.List.NonEmpty (NonEmpty)
-
 toRomanMap :: [(Int, [Char])]
 toRomanMap =
   [ (1000, "M"),
@@ -59,12 +56,3 @@ toRoman nb
     toRoman' nb list@((k, v) : rest)
       | nb >= k = v ++ toRoman' (nb - k) list
       | otherwise = toRoman' nb rest
-
--- TODO: remove when finished
-verifyRoman :: Int -> IO ()
-verifyRoman n
-  | n > maxValue = putStrLn "FINITO ALL GOOD"
-  | n == fromRoman (toRoman n) = do
-    putStrLn $ show n ++ " OK"
-    verifyRoman $ n + 1
-  | otherwise = putStrLn $ "ERREUR, nombre " ++ show n
