@@ -1,2 +1,0 @@
-https://gist.github.com/komu/1307152/79acff025b1b10f088ad5236431114e151b984a1
-Labo 3 de poa en haskell

@@ -1,7 +1,9 @@
---import Control.Monad
-import Data.String
 import Text.Printf (printf)
 
+-- Créations des différentes structures de données
+
+-- Ici nous avons choisi de ne pas modéliser le fermier. 
+-- Nous considérons que le fermier sera toujours au même endroit que le bateau
 data Passenger
   = Cabbage
   | Goat
@@ -19,8 +21,6 @@ data BoatSide
   deriving (Eq)
 
 instance Show BoatSide where
-  -- show LeftSide  = " |<__> ~ ~ ~ riviere ~ ~ ~     | "
-  -- show RightSide = " |     ~ ~ ~ riviere ~ ~ ~ <__>| "
   show LeftSide = "gauche"
   show RightSide = "droite"
 
@@ -32,6 +32,8 @@ data Boat = Boat
 instance Show Boat where
   show (Boat side pass) = "Rive " ++ show side ++ " et contient: " ++ show pass
 
+-- Un état du jeu est représenté par liste des passagers sur la rive gauche, une liste pour la rive droite
+-- et un boat.
 data State = State
   { leftPpl :: [Passenger],
     boat :: Boat,
@@ -59,12 +61,22 @@ impossible = putStrLn "Opération impossible"
 finished :: State -> IO ()
 finished state = putStrLn (show state ++ "\nVous avez fini ! Tapez :r pour recommencer ou :q pour quitter")
 
+startingMessage :: String
+startingMessage = "Bienvenue au jeu de la rivière ! Tapez \":h\" pour obtenir de l'aide.\n" ++ show startingState
+
 startingState :: State
 startingState = State [Wolf, Goat, Cabbage] (Boat LeftSide []) []
 
+-- Fonction main affichant le message de bienvenue et récupère l'input
 main :: IO ()
-main = getInput startingState
+main = do
+    putStrLn startingMessage
+    getInput startingState
 
+
+-- Récupère l'input de l'utilisateur.
+-- Si l'input est ":q" nous quittons le programme
+-- Sinon nous utilisons la fonction checkInput 
 getInput :: State -> IO ()
 getInput state = do
   s <- getLine
@@ -75,16 +87,25 @@ getInput state = do
       snd current
       getInput $ fst current
 
+-- La fonction checkInput permet de vérifier si l'input utilisateur correspond à une fonction.
+-- Cette fonction renvoie un tuple contenant un état du jeu et un potentiel message d'erreur
+-- Par exemple, si nous tentons de
 checkInput :: [Char] -> State -> (State, IO ())
 checkInput input state
   | input == ":p" = (state, print state)
-  | input == ":l Goat" = if isStateValid (fst gState) && snd gState then (fst gState, return ()) else (state, impossible)
-  | input == ":l Cabbage" = if isStateValid (fst cState) && snd cState then (fst cState, return ()) else (state, impossible)
-  | input == ":l Wolf" = if isStateValid (fst wState) && snd wState then (fst wState, return ()) else (state, impossible)
+  -- Nous vérifions si il est possible de charger la chèvre. Si c'est impossible nous renvoyons un message d'erreur
+  | input == ":l Goat" = if snd gState then (fst gState, return ()) else (state, impossible)
+  -- Idem que pour la chèvre
+  | input == ":l Cabbage" = if snd cState then (fst cState, return ()) else (state, impossible)
+  -- Idem que pour la chèvre
+  | input == ":l Wolf" = if snd wState then (fst wState, return ()) else (state, impossible)
+  -- Nous vérifions à chaque unload si le jeu est terminé. Si oui, nous affichons un message
   | input == ":u" = if isFinished uState then (uState, finished uState) else (uState, return ())
+  -- Nous vérifions s'il est possible de bouger le bateau. (ex: il est impossible de bouger le bateau si il ne reste que la chèvre et le loup sur la rive)
   | input == ":m" = if isStateValid mState then (mState, return ()) else (state, impossible)
   | input == ":r" = (startingState, return ())
   | input == ":h" = (state, help)
+  -- Si la commande ne correspond à aucun pattern testé, retourne un message d'erreur
   | otherwise = (state, putStrLn "Input invalide, tapez :h pour l'aide")
   where
     gState = load Goat state
@@ -93,17 +114,19 @@ checkInput input state
     uState = unload state
     mState = move state
 
--- Move the boat to the other side if the fishermann is in it. Otherwise does nothing
+-- Bouge le bateau sur l'autre rive
 move :: State -> State
 move state = State (leftPpl state) (changeSide (boat state)) (rightPpl state)
 
--- Small function that create a state similar to the one we give in parameters but the riverside is changed
--- Its used in the move function
+-- Fonction permettant de changer le côté du bateau.
+-- est utilisé dans la fonction move
 changeSide :: Boat -> Boat
 changeSide boat
   | side boat == LeftSide = Boat RightSide (passenger boat)
   | otherwise = Boat LeftSide (passenger boat)
 
+-- Permet de charger un passager sur le bateau
+-- Retourne un tuple contenant un état du jeu et un bool disant si l'on peut load ce passager
 load :: Passenger -> State -> (State, Bool)
 load pass state
   -- Bateau deja plein, on ne fait rien
@@ -128,15 +151,15 @@ load pass state
   where
     bSide = side (boat state)
 
--- Remove a passenger from a list of passenger. As there is only 1 passenger of every type,
--- if we find that passenger we dont need to finish the recursion
+-- Enlève un passager d'une liste de passager.
+-- Vu qu'il n'existe qu'une seule instance pour chaque passager, dès que nous le trouvons dans la liste nous pouvons arrêter la récursion
 removePassenger :: Passenger -> [Passenger] -> [Passenger]
 removePassenger _ [] = []
 removePassenger pass (x : xs)
   | pass == x = xs
   | otherwise = x : removePassenger pass xs
 
--- Unload the passenger from the boat. If the boat is already empty it does nothing
+-- Décharge le passager du bateau. Si le bateau est vide, cette fonction ne fait rien
 unload :: State -> State
 unload state
   | null (passenger (boat state)) = state
@@ -145,6 +168,7 @@ unload state
   where
     b = boat state
 
+-- Vérifie si un état de jeu est valide ou non
 isStateValid :: State -> Bool
 isStateValid state
   | side (boat state) == LeftSide = notElem Goat rPpl || length rPpl == 1
@@ -153,22 +177,24 @@ isStateValid state
     rPpl = rightPpl state
     lPpl = leftPpl state
 
+-- Vérifie si le jeu est terminé
 isFinished :: State -> Bool
 isFinished state = length (rightPpl state) == 3
 
+-- Permet d'afficher tous les passagers d'une liste de passagers
 displayPassengers :: [Passenger] -> [Char]
 displayPassengers [] = "[]"
 displayPassengers (x : xs)
   | null xs = show x
   | otherwise = show x ++ " " ++ displayPassengers xs
 
--- Show all the command we can use
+-- Affiche l'aide
 help :: IO ()
 help = do
   putStrLn "---------------------------------------------------------------------------------"
   putStrLn "Voici la liste des commandes :"
   printf "%-15s %s" ":p" "Afficher l'état du jeu\n"
-  printf "%-15s %s" ":l <passager>" "Charger le bateau\n"
+  printf "%-15s %s" ":l <passager>" "Charger le bateau (exemple: \":l Goat\")\n"
   printf "%-15s %s" ":u" "Décharger le bateau\n"
   printf "%-15s %s" ":m" "Bouger le bateau\n"
   printf "%-15s %s" ":r" "Restart le jeu\n"
