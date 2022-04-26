@@ -70,9 +70,9 @@ isZero :: Nat -> Bool
 isZero Z = True
 isZero _ = False
 
-succ :: Nat -> Nat
-succ = S
+successor :: Nat -> Nat
+successor = S
 
-pred :: Nat -> Nat
-pred Z = Z
-pred (S x) = x
+predecessor :: Nat -> Nat
+predecessor Z = Z
+predecessor (S x) = x
