@@ -4,6 +4,10 @@ module Roman
   )
 where
 
+-- Module permettant de convertir un nombre entier positif (≤ 3999) vers 
+-- sa représentation en numération romaine
+-- Auteurs: Jonathan Friedli et Valentin Kaelin
+
 toRomanMap :: [(Int, [Char])]
 toRomanMap =
   [ (1000, "M"),

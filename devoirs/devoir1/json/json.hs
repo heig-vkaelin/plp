@@ -2,6 +2,10 @@ import Data.Char
 import System.Environment (getArgs, getProgName)
 import System.IO (IOMode (ReadMode), hGetContents, openFile)
 
+-- Module qui permet d’analyser lexicalement (tokenizer) un document JSON, 
+-- dont le nom est passé en argument de ligne de commande. 
+-- Auteurs: Jonathan Friedli et Valentin Kaelin
+
 data Token
   = JNull
   | JBool Bool

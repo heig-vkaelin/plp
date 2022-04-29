@@ -1,7 +1,11 @@
 import Text.Printf (printf)
 
--- Créations des différentes structures de données
+-- Programme qui permet de jouer au fameux jeu de raisonnement mathématique 
+-- le loup, la chèvre et les choux
+-- Auteurs: Jonathan Friedli et Valentin Kaelin
 
+
+-- Créations des différentes structures de données
 -- Ici nous avons choisi de ne pas modéliser le fermier. 
 -- Nous considérons que le fermier sera toujours au même endroit que le bateau
 data Passenger

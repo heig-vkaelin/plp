@@ -1,5 +1,9 @@
 module Natural where
 
+-- Module permettant qui permet de manipuler des entiers de Peano 
+-- Auteurs: Jonathan Friedli et Valentin Kaelin
+
+
 data Nat
   = Z
   | S Nat

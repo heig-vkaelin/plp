@@ -2,6 +2,10 @@ import System.Environment (getArgs, getProgName)
 import System.IO (IOMode (ReadMode), hGetContents, openFile)
 import Text.Printf (printf)
 
+-- Programme prenant en paramètres des fichiers contenant du texte et qui affiche à l'écran
+-- le nombre de lignes, de mots et de caractères figurant dans chaque fichier donné
+-- Auteurs: Jonathan Friedli et Valentin Kaelin
+
 main :: IO ()
 main =
   do
