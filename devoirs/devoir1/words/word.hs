@@ -5,6 +5,7 @@ import Text.Printf (printf)
 -- Programme prenant en paramètres des fichiers contenant du texte et qui affiche à l'écran
 -- le nombre de lignes, de mots et de caractères figurant dans chaque fichier donné
 -- Auteurs: Jonathan Friedli et Valentin Kaelin
+-- Date dernière modification: 29 avril 2022
 
 main :: IO ()
 main =

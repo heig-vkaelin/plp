@@ -3,6 +3,7 @@ import Text.Printf (printf)
 -- Programme qui permet de jouer au fameux jeu de raisonnement mathématique 
 -- le loup, la chèvre et les choux
 -- Auteurs: Jonathan Friedli et Valentin Kaelin
+-- Date dernière modification: 29 avril 2022
 
 
 -- Créations des différentes structures de données

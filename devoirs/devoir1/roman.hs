@@ -7,6 +7,7 @@ where
 -- Module permettant de convertir un nombre entier positif (≤ 3999) vers 
 -- sa représentation en numération romaine
 -- Auteurs: Jonathan Friedli et Valentin Kaelin
+-- Date dernière modification: 29 avril 2022
 
 toRomanMap :: [(Int, [Char])]
 toRomanMap =

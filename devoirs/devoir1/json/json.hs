@@ -5,6 +5,7 @@ import System.IO (IOMode (ReadMode), hGetContents, openFile)
 -- Module qui permet d’analyser lexicalement (tokenizer) un document JSON, 
 -- dont le nom est passé en argument de ligne de commande. 
 -- Auteurs: Jonathan Friedli et Valentin Kaelin
+-- Date dernière modification: 29 avril 2022
 
 data Token
   = JNull

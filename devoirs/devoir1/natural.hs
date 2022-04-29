@@ -2,6 +2,7 @@ module Natural where
 
 -- Module permettant qui permet de manipuler des entiers de Peano 
 -- Auteurs: Jonathan Friedli et Valentin Kaelin
+-- Date dernière modification: 29 avril 2022
 
 
 data Nat
