@@ -1,0 +1,31 @@
+- student: Friedli / Kaelin
+- roman:
+  - correctness:                                    0.2 # max 0.2
+  - complexity:                                     0.2 # max 0.2
+  - performance:                                    0.2 # max 0.2
+  - modularity:                                     0.2 # max 0.2
+  - style:                                          0.2 # max 0.2
+- word:
+  - correctness:                                    0.2 # max 0.2
+  - complexity:                                     0.2 # max 0.2
+  - performance:                                    0.2 # max 0.2
+  - modularity:                                     0.2 # max 0.2
+  - style:                                          0.2 # max 0.2
+- natural:
+  - correctness:                                    0.2 # max 0.2
+  - complexity:                                     0.2 # max 0.2
+  - performance:                                    0.2 # max 0.2
+  - modularity:                                     0.2 # max 0.2
+  - style:                                          0.2 # max 0.2
+- json:
+  - correctness:                                    0.2 # max 0.2
+  - complexity:                                     0.2 # max 0.2
+  - performance:                                    0.2 # max 0.2
+  - modularity:                                     0.2 # max 0.2
+  - style:                                          0.3 # max 0.2 +0.1 for program usage
+- river:
+  - correctness:                                    0.2 # max 0.2
+  - complexity:                                     0.2 # max 0.2
+  - performance:                                    0.1 # max 0.1 -0.1 not great to have all these locals in the where clause of `checkInput` that are evaluated regardless of which guard is taken
+  - modularity:                                     0.2 # max 0.2
+  - style:                                          0.1 # max 0.2 -0.1 `checkInput` would be more elegant and more readable with pattern matching rather than guards 
