@@ -42,12 +42,13 @@ tokens :-
   ")"                            { \s -> TRParen }
   ","                            { \s -> TComma }
   "->"                           { \s -> TArrow }
-  "func"                         { \s -> TFunction s }
+  "func"                         { \s -> TFunction }
   let                            { \s -> TLet }
   in                             { \s -> TIn }
   case                           { \s -> TCase }
   of                             { \s -> TOf }
-  [\_]? $lower [$alpha $digit]*  { \s -> TVar s }
+  var                            { \s -> TVar }
+  [\_]? $lower [$alpha $digit]*  { \s -> TName s }
   .                              { \s -> TErr s }
 {
 
@@ -76,12 +77,13 @@ data Token
   | TRParen
   | TComma
   | TArrow
-  | TFunction String
+  | TFunction
   | TLet
   | TIn
   | TCase
   | TOf
-  | TVar String
+  | TVar
+  | TName String
   | TErr String
   deriving (Eq, Show)
 

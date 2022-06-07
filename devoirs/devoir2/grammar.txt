@@ -13,17 +13,17 @@ Bool -> True | False
 Universal -> _
 
 Tuple -> '(' Expr ',' Expr ')'
-Value -> Universal | Int | Bool | Tuple
+Value -> Int | Bool | Tuple
 
 -- définition de variables;
 NameDef -> ['_']LetterLowercase{Alphanumeric}
 VarDef -> 'var' NameDef '=' Expr
 
 -- Définition de fonctions (non-récursives); 
-FuncDef -> 'func' NameDef '(' [Arg] ')' '=' Expr
-Arg -> Type NameDef | TypedTuple
+FuncDef -> 'func' NameDef '(' [Params] ')' '=' Expr
+Params -> Type NameDef | TypedTuple
 Type -> 'Integer' | 'Boolean' | TypedTuple
-TypedTuple -> '(' Arg ',' Arg ')'
+TypedTuple -> '(' Params ',' Params ')'
 
 -- Définition globale
 Def -> VarDef | FuncDef
@@ -32,15 +32,16 @@ Def -> VarDef | FuncDef
 Var -> NameDef
 
 -- applications de fonction;
-FuncApp -> NameDef '(' [FuncParams] ')'
-FuncParams -> Expr | FuncParams ',' Expr
+FuncApp -> NameDef '(' [FuncArgs] ')'
+FuncArgs -> Expr | FuncArgs ',' Expr
 
 -- expressions let-in avec plusieurs définitions; 
 LetIn -> 'let' {Def} 'in' Expr
 
 -- expressions case-of sans gardes avec motifs universel, variable, littéraux;
 CaseOf -> 'case' Expr 'of' CaseOfPatterns
-CaseOfPatterns -> {'(' Value | Var  '->' Expr ')'}
+CaseOfPatterns -> {'(' Pattern  '->' Expr ')'}
+Pattern -> Value | Var | Universal
 
 -- opérations unaires, binaires.
 UnaryOp -> '-' | '!' | '++' | '--'
