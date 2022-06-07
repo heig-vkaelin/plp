@@ -20,8 +20,10 @@ NameDef -> ['_']LetterLowercase{Alphanumeric}
 VarDef -> 'var' NameDef '=' Expr
 
 -- Définition de fonctions (non-récursives); 
-FuncDef -> 'func' NameDef '(' [FuncParams] ')' '=' Expr
-FuncParams -> Expr | FuncParams ',' Expr
+FuncDef -> 'func' NameDef '(' [Arg] ')' '=' Expr
+Arg -> Type NameDef | TypedTuple
+Type -> 'Integer' | 'Boolean' | TypedTuple
+TypedTuple -> '(' Arg ',' Arg ')'
 
 -- Définition globale
 Def -> VarDef | FuncDef
@@ -30,7 +32,8 @@ Def -> VarDef | FuncDef
 Var -> NameDef
 
 -- applications de fonction;
-FuncApp -> NameDef '(' FuncParam ')'
+FuncApp -> NameDef '(' [FuncParams] ')'
+FuncParams -> Expr | FuncParams ',' Expr
 
 -- expressions let-in avec plusieurs définitions; 
 LetIn -> 'let' {Def} 'in' Expr
