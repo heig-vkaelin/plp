@@ -1,0 +1,56 @@
+-- Grammaire dans le style EBNF de notre langage de programmation fonctionnelle
+-- Auteurs: Jonathan Friedli et Valentin Kaelin
+-- Date dernière modification: 07 juin 2022
+
+-- littéraux entiers, booléens, tuples;
+LetterUppercase -> [A-Z]
+LetterLowercase -> [a-z]
+Char -> LetterUppercase | LetterLowercase
+Number -> [0-9]
+Int -> {Number}
+Alphanumeric -> Char | Int
+Bool -> True | False
+Universal -> _
+
+Tuple -> '(' Expr ',' Expr ')'
+Value -> Universal | Int | Bool | Tuple
+
+-- définition de variables;
+NameDef -> ['_']LetterLowercase{Alphanumeric}
+VarDef -> 'var' NameDef '=' Expr
+
+-- Définition de fonctions (non-récursives); 
+FuncDef -> 'func' NameDef '(' [FuncParams] ')' '=' Expr
+FuncParams -> Expr | FuncParams ',' Expr
+
+-- Définition globale
+Def -> VarDef | FuncDef
+
+-- occurrences de variable;
+Var -> NameDef
+
+-- applications de fonction;
+FuncApp -> NameDef '(' FuncParam ')'
+
+-- expressions let-in avec plusieurs définitions; 
+LetIn -> 'let' {Def} 'in' Expr
+
+-- expressions case-of sans gardes avec motifs universel, variable, littéraux;
+CaseOf -> 'case' Expr 'of' CaseOfPatterns
+CaseOfPatterns -> {'(' Value | Var  '->' Expr ')'}
+
+-- opérations unaires, binaires.
+UnaryOp -> '-' | '!' | '++' | '--'
+BinaryOp -> '+' | '-' | '*' | '/' | '%' | '>' | '<' | '>=' | '<=' | '==' | '!=' | '&&' | '||'
+
+Expr -> 
+    Value
+  | Var 
+  | FuncApp
+  | LetIn
+  | CaseOf
+  | UnaryOp Expr
+  | Expr BinaryOp Expr
+
+-- Point d'entrée du programme
+App -> {Expr | Def}
