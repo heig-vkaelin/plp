@@ -13,3 +13,7 @@
 
 # Fichiers de tests JSON
 *.json
+
+# Fichiers générés par Happy
+.hs
+*.info
