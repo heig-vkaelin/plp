@@ -18,6 +18,7 @@ tokens :-
   $white+                        ;
   "--".*                         ;
   $digit+                        { \s -> TInt (read s) }
+  "Integer" | "Boolean"          { \s -> TType s }
   "True"                         { \s -> TBool True }
   "False"                        { \s -> TBool False }
   "_"                            { \s -> TUniversal }
@@ -54,6 +55,7 @@ tokens :-
 
 data Token
   = TInt Int
+  | TType String
   | TBool Bool
   | TUniversal
   | TEq
