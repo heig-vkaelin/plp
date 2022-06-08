@@ -172,5 +172,5 @@ BinaryOp
 
 {
 parseError :: [Token] -> a
-parseError _ = error "Parse error test"
+parseError x = error ("Parse error: " ++ show x)
 }
