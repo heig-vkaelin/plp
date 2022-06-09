@@ -47,8 +47,8 @@ data Value
   deriving (Show)
 
 data Type
-  = TBool
-  | TInt
+  = TBoolean
+  | TInteger
   | TTuple Type Type
   | TUniversal
   deriving (Show, Eq)

@@ -115,8 +115,8 @@ FuncDef
       | 'func' 'name' '(' ')' '=' Expr                          { Language.Definition $2 [] $6 }
 
 Type
-      : 'integer'                                               { Language.TInt }
-      | 'boolean'                                               { Language.TBool }
+      : 'integer'                                               { Language.TInteger }
+      | 'boolean'                                               { Language.TBoolean }
       -- | '(' Param ',' Param ')'                                 { Language.TTuple $2 $4 } -- TODO
 
 Params 

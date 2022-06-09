@@ -811,13 +811,13 @@ happyReduction_19 ((HappyAbsSyn5  happy_var_6) `HappyStk`
 happyReduce_20 = happySpecReduce_1  11 happyReduction_20
 happyReduction_20 _
 	 =  HappyAbsSyn11
-		 (Language.TInt
+		 (Language.TInteger
 	)
 
 happyReduce_21 = happySpecReduce_1  11 happyReduction_21
 happyReduction_21 _
 	 =  HappyAbsSyn11
-		 (Language.TBool
+		 (Language.TBoolean
 	)
 
 happyReduce_22 = happySpecReduce_1  12 happyReduction_22
@@ -1102,7 +1102,7 @@ happySeq = happyDontSeq
 
 
 parseError :: [Token] -> a
-parseError x = error ("Parse error test" ++ show x)
+parseError x = error ("Parse error: " ++ show x)
 {-# LINE 1 "templates/GenericTemplate.hs" #-}
 -- $Id: GenericTemplate.hs,v 1.26 2005/01/14 14:47:22 simonmar Exp $
 
