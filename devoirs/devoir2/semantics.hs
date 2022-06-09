@@ -8,13 +8,14 @@ type Name = String
 
 type Env = [(Name, Type)]
 
--- Variables
-lookup :: Name -> Env -> Type
-lookup x [] = error $ x ++ " not found"
-lookup x ((n, t) : env)
-  | x == n = t
-  | otherwise = Semantics.lookup x env
+getType :: Name -> Env -> Type
+getType x env = case lookup x env of
+  Just t -> t
+  Nothing -> error $ x ++ " not found"
 
+-- -----------------------
+-- Statements
+-- -----------------------
 typeof :: Statement -> Env -> Type
 typeof (Expr e) env = typeofExpr e env
 typeof _ _ = error "typeof: not implemented"
@@ -24,7 +25,7 @@ typeof _ _ = error "typeof: not implemented"
 -- -----------------------
 typeofExpr :: Expr -> Env -> Type
 typeofExpr (EValue v) env = typeofValue v env
-typeofExpr (EVar x) env = Semantics.lookup x env
+typeofExpr (EVar x) env = getType x env
 typeofExpr (EBinary op x y) env = typeofBinary op x y env
 typeofExpr (EUnary op x) env = typeofUnary op x env
 typeofExpr _ _ = error "typeofExpr: not implemented"
@@ -45,6 +46,7 @@ typeofBinary (Operator Arithmetic _) x y env =
 typeofBinary (Operator Comparison _) x y env =
   case (typeofExpr x env, typeofExpr y env) of
     (TInteger, TInteger) -> TBoolean
+    (TBoolean, TBoolean) -> TBoolean
     _ -> error "Type error: Comparison Operation invalid"
 -- Expressions relationnelles
 typeofBinary (Operator Relational _) x y env =
