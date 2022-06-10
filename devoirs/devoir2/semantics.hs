@@ -4,6 +4,9 @@ import Language
 import Lexer
 import Parser
 
+-- -----------------------
+-- Environment
+-- -----------------------
 type Name = String
 
 type Env = [(Name, Type)]
@@ -136,7 +139,7 @@ typeofDef (Definition x ((Arg type' name) : args) body) env = typeofDef (Definit
 
 -- typeof (parser $ lexer $ "let var x = 2 var y = 3 in x * y * 2") []
 
--- typeof (parser $ lexer $ "let func x (Integer z) = z + 2 var y = 3 in x * y * 2") []
+-- typeof (parser $ lexer $ "let func x (Integer z) = z + 2 var y = 3 in x(3) * y * 2") []
 
 -- typeof (parser $ lexer $ "let func x () = 2 + 2 var y = 3 in z(3)") []
 -- typeof (parser $ lexer $ "let func x () = 2 + 2 var y = 3 in x") []
