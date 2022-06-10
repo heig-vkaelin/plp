@@ -116,7 +116,7 @@ typeofApp name args env =
       if (length args == length args') && all (\(t, a) -> t == typeofExpr a env) (zip args' args)
         then t
         else error "Type error: params of function invalid"
-    _ -> error $ "Type error: call to unknown function " ++ show name ++ " " ++ show env
+    _ -> error $ "Type error: call to unknown function " ++ show name
 
 -- -----------------------
 -- Définitions
