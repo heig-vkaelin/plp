@@ -39,6 +39,7 @@ FuncArgs -> Expr | FuncArgs ',' Expr
 LetIn -> 'let' {Def} 'in' Expr
 
 -- expressions case-of sans gardes avec motifs universel, variable, littéraux;
+-- Information: les variables dans les patternes doivent être déclarées avant le case, contrairement à Haskell par exemple
 CaseOf -> 'case' Expr 'of' CaseOfPatterns
 CaseOfPatterns -> {'(' Pattern  '->' Expr ')'}
 Pattern -> Value | Var | Universal

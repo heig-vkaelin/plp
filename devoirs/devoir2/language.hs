@@ -50,5 +50,6 @@ data Type
   = TBoolean
   | TInteger
   | TTuple Type Type
+  | TFunc Type [Type]
   | TUniversal
   deriving (Show, Eq)
