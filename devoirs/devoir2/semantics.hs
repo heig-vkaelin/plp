@@ -14,11 +14,12 @@ getType x env = case lookup x env of
   Nothing -> error $ x ++ " not found"
 
 addToEnv :: Definition -> Env -> Env
-addToEnv (Definition id [] expr) env = (id, typeofExpr expr env) : env -- variables
-addToEnv (Definition id args expr) env = (id, typeofExpr expr env') : env' -- fonctions
+addToEnv (Definition id [] expr) env = (id, typeofExpr expr env) : env -- Variables
+addToEnv (Definition id args expr) env = (id, TFunc (typeofExpr expr env') args') : env -- Fonctions
   where
     -- Ajout des éventuels arguments TODO TFunc si argument il y a
     env' = foldl (\env (Arg t id) -> (id, t) : env) env args
+    args' = map (\(Arg t id) -> t) args
 
 addAllToEnv :: [Definition] -> Env -> Env
 addAllToEnv defs env = foldr addToEnv env defs
@@ -105,6 +106,8 @@ typeOfPattern (PVar x) env = getType x env
 typeOfPattern (PValue x) env = typeofValue x env
 typeOfPattern PUniversal env = Language.TUniversal
 
+-- TODO: application de fonction
+
 -- -----------------------
 -- Définitions
 -- -----------------------
@@ -128,6 +131,7 @@ typeofDef (Definition x ((Arg type' name) : args) body) env = typeofDef (Definit
 
 -- TODO: ne devrait pas marcher ? x sans params
 -- typeof (parser $ lexer $ "let func x (Integer z) = z + 2 var y = 3 in x * y * 2") []
+-- typeof (parser $ lexer $ "let func x (Integer z) = z + 2 var y = 3 in x") []
 
 -- typeof (parser $ lexer $ "case 3 * 3 of (6 -> True) (2 -> False) (x -> False)") [("x", TInteger)]
 -- typeof (parser $ lexer $ "case 3 * 3 of (6 -> True) (2 -> False) (x -> False) (_ -> False)") [("x", TInteger)]
