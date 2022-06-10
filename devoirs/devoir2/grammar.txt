@@ -32,7 +32,8 @@ Def -> VarDef | FuncDef
 Var -> NameDef
 
 -- applications de fonction;
-FuncApp -> NameDef '(' [FuncArgs] ')'
+-- Note: les fonctions à un seul paramètre sont traitées comme de simples variables
+FuncApp -> NameDef '(' FuncArgs ')'
 FuncArgs -> Expr | FuncArgs ',' Expr
 
 -- expressions let-in avec plusieurs définitions; 

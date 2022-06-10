@@ -129,7 +129,6 @@ Param
 -- applications de fonction;
 FuncApp
       : 'name' '(' FuncArgs ')'                                 { Language.EApp $1 $3 }
-      | 'name' '(' ')'                                          { Language.EApp $1 [] }
 
 FuncArgs
       : Expr                                                    { [$1] }

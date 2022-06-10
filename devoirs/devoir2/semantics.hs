@@ -9,17 +9,16 @@ type Name = String
 type Env = [(Name, Type)]
 
 getType :: Name -> Env -> Type
-getType x env = case lookup x env of
+getType name env = case lookup name env of
   Just t -> t
-  Nothing -> error $ x ++ " not found"
+  Nothing -> error $ name ++ " not found"
 
 addToEnv :: Definition -> Env -> Env
-addToEnv (Definition id [] expr) env = (id, typeofExpr expr env) : env -- Variables
-addToEnv (Definition id args expr) env = (id, TFunc (typeofExpr expr env') args') : env -- Fonctions
+addToEnv (Definition name [] expr) env = (name, typeofExpr expr env) : env -- Variables
+addToEnv (Definition name args expr) env = (name, TFunc (typeofExpr expr env') args') : env -- Fonctions
   where
-    -- Ajout des éventuels arguments TODO TFunc si argument il y a
-    env' = foldl (\env (Arg t id) -> (id, t) : env) env args
-    args' = map (\(Arg t id) -> t) args
+    env' = foldl (\env (Arg t name) -> (name, t) : env) env args
+    args' = map (\(Arg t name) -> t) args
 
 addAllToEnv :: [Definition] -> Env -> Env
 addAllToEnv defs env = foldr addToEnv env defs
@@ -35,13 +34,13 @@ typeof (Def d) env = typeofDef d env
 -- Expressions
 -- -----------------------
 typeofExpr :: Expr -> Env -> Type
+typeofExpr (EApp name args) env = typeofApp name args env
 typeofExpr (ELet defs e) env = typeofLet defs e env
-typeofExpr (EVar x) env = getType x env
+typeofExpr (EVar name) env = getType name env
 typeofExpr (EValue v) env = typeofValue v env
 typeofExpr (ECaseOf e cases) env = typeofCaseOf e cases env
 typeofExpr (EBinary op x y) env = typeofBinary op x y env
 typeofExpr (EUnary op x) env = typeofUnary op x env
-typeofExpr _ _ = error "typeofExpr: not implemented"
 
 -- Valeurs / Littéraux
 typeofValue :: Value -> Env -> Type
@@ -106,7 +105,15 @@ typeOfPattern (PVar x) env = getType x env
 typeOfPattern (PValue x) env = typeofValue x env
 typeOfPattern PUniversal env = Language.TUniversal
 
--- TODO: application de fonction
+-- Application de fonction
+typeofApp :: Name -> [Expr] -> Env -> Type
+typeofApp name args env =
+  case lookup name env of
+    Just (TFunc t args') ->
+      if (length args == length args') && all (\(t, a) -> t == typeofExpr a env) (zip args' args)
+        then t
+        else error "Type error: params of function invalid"
+    _ -> error $ "Type error: call to unknown function " ++ show name ++ " " ++ show env
 
 -- -----------------------
 -- Définitions
@@ -129,9 +136,12 @@ typeofDef (Definition x ((Arg type' name) : args) body) env = typeofDef (Definit
 
 -- typeof (parser $ lexer $ "let var x = 2 var y = 3 in x * y * 2") []
 
--- TODO: ne devrait pas marcher ? x sans params
 -- typeof (parser $ lexer $ "let func x (Integer z) = z + 2 var y = 3 in x * y * 2") []
--- typeof (parser $ lexer $ "let func x (Integer z) = z + 2 var y = 3 in x") []
+
+-- typeof (parser $ lexer $ "let func x () = 2 + 2 var y = 3 in z(3)") []
+-- typeof (parser $ lexer $ "let func x () = 2 + 2 var y = 3 in x") []
+-- typeof (parser $ lexer $ "let func x (Integer z) = z + 2 var y = 3 in x(3)") []
+-- typeof (parser $ lexer $ "let func x (Integer z) = z + 2 var y = 3 in x(True)") []
 
 -- typeof (parser $ lexer $ "case 3 * 3 of (6 -> True) (2 -> False) (x -> False)") [("x", TInteger)]
 -- typeof (parser $ lexer $ "case 3 * 3 of (6 -> True) (2 -> False) (x -> False) (_ -> False)") [("x", TInteger)]
