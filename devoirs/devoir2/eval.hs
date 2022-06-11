@@ -108,16 +108,16 @@ evalUnary _ _ _ = error "Eval error: Unary Operation invalid"
 
 -- Case
 evalCaseOf :: Expr -> [(Pattern, Expr)] -> Env -> Value
-evalCaseOf expr cases@((pattern, value) : xs) env =
+evalCaseOf expr cases@((pattern, value) : _) env =
   case pattern of
     PUniversal -> evalExpr value env
-    _ -> checkPattern' cases
+    _ -> checkPattern cases
   where
-    checkPattern' :: [(Pattern, Expr)] -> Value
-    checkPattern' [] = error "Eval error: no pattern match"
-    checkPattern' ((pattern', value') : xs')
+    checkPattern :: [(Pattern, Expr)] -> Value
+    checkPattern [] = error "Eval error: no pattern match"
+    checkPattern ((pattern', value') : xs)
       | compareValues (evalExpr expr env) (evalPattern pattern' env) env = evalExpr value' env
-      | otherwise = evalCaseOf expr xs' env
+      | otherwise = evalCaseOf expr xs env
 evalCaseOf _ _ _ = error "Eval error: no pattern match"
 
 evalPattern :: Pattern -> Env -> Value
