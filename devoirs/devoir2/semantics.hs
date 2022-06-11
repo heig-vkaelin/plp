@@ -1,5 +1,6 @@
 module Semantics (typeof) where
 
+import Data.List (find)
 import Language
 import Lexer
 import Parser
@@ -7,8 +8,6 @@ import Parser
 -- -----------------------
 -- Environment
 -- -----------------------
-type Name = String
-
 type Env = [(Name, Type)]
 
 getType :: Name -> Env -> Type
@@ -44,36 +43,37 @@ typeofExpr (EValue v) env = typeofValue v env
 typeofExpr (ECaseOf e cases) env = typeofCaseOf e cases env
 typeofExpr (EBinary op x y) env = typeofBinary op x y env
 typeofExpr (EUnary op x) env = typeofUnary op x env
+typeofExpr (ETuple x y) env = TTuple (typeofExpr x env) (typeofExpr y env)
 
 -- Valeurs / Littéraux
 typeofValue :: Value -> Env -> Type
 typeofValue (VInt _) env = TInteger
 typeofValue (VBool _) env = TBoolean
-typeofValue (VTuple x y) env = TTuple (typeofExpr x env) (typeofExpr y env)
+typeofValue (VTuple x y) env = TTuple (typeofValue x env) (typeofValue y env)
 
--- Expressions arithmétiques
+-- Opérations arithmétiques
 typeofBinary :: Operator -> Expr -> Expr -> Env -> Type
 typeofBinary (Operator Arithmetic _) x y env =
   case (typeofExpr x env, typeofExpr y env) of
     (TInteger, TInteger) -> TInteger
     _ -> error "Type error: Arithmetic Operation invalid"
--- Expressions Comparaisons
+-- Opérations Comparaisons
 typeofBinary (Operator Comparison _) x y env =
   if typeofExpr x env == typeofExpr y env
     then TBoolean
     else error "Type error: Comparison Operation invalid"
--- Expressions relationnelles
+-- Opérations relationnelles
 typeofBinary (Operator Relational _) x y env =
   case (typeofExpr x env, typeofExpr y env) of
     (TInteger, TInteger) -> TBoolean
     _ -> error "Type error: Relational Operation invalid"
--- Expressions logiques
+-- Opérations logiques
 typeofBinary (Operator Logical _) x y env =
   case (typeofExpr x env, typeofExpr y env) of
     (TBoolean, TBoolean) -> TBoolean
     _ -> error "Type error: Logical Operation invalid"
 
--- Expression unaires
+-- Opérations unaires
 typeofUnary :: Operator -> Expr -> Env -> Type
 typeofUnary (Operator Arithmetic _) x env =
   case typeofExpr x env of
@@ -94,13 +94,13 @@ typeofLet defs body env = typeofExpr body env'
 -- Case
 typeofCaseOf :: Expr -> [(Pattern, Expr)] -> Env -> Type
 typeofCaseOf cond cases env =
-  if any (\(p, e) -> (p /= typeCond && p /= Language.TUniversal) || e /= typeFirstResult) typedCases
+  if any (\(p, e) -> (p /= condType && p /= Language.TUniversal) || e /= exprType) typedCases
     then error "Type error: Case Operation invalid"
-    else typeFirstResult
+    else exprType
   where
-    typeCond = typeofExpr cond env
-    typeFirstResult = typeofExpr (snd $ head cases) env
+    condType = typeofExpr cond env
     typedCases = map (\(p, e) -> (typeOfPattern p env, typeofExpr e env)) cases
+    exprType = snd $ head typedCases
 
 typeOfPattern :: Pattern -> Env -> Type
 typeOfPattern (PVar x) env = getType x env
@@ -149,3 +149,7 @@ typeofDef (Definition x ((Arg type' name) : args) body) env = typeofDef (Definit
 
 -- typeof (parser $ lexer $ "case 3 * 3 of (6 -> True) (2 -> False) (x -> False)") [("x", TInteger)]
 -- typeof (parser $ lexer $ "case 3 * 3 of (6 -> True) (2 -> False) (x -> False) (_ -> False)") [("x", TInteger)]
+
+-- typeof (parser $ lexer $ "case 3 * 3 of (_ -> True) (3 -> False)") []
+-- typeof (parser $ lexer $ "case 3 * 3 of (3 -> False) (_ -> True)") []
+-- typeof (parser $ lexer $ "case 3 * 3 of (_ -> True)") []

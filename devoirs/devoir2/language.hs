@@ -1,5 +1,7 @@
 module Language where
 
+type Name = String
+
 data Statement
   = Def Definition
   | Expr Expr
@@ -13,6 +15,7 @@ data Expr
   | ECaseOf Expr [(Pattern, Expr)]
   | EUnary Operator Expr
   | EBinary Operator Expr Expr
+  | ETuple Expr Expr
   deriving (Show)
 
 data Operator
@@ -43,8 +46,8 @@ data Arg
 data Value
   = VBool Bool
   | VInt Int
-  | VTuple Expr Expr
-  deriving (Show)
+  | VTuple Value Value
+  deriving (Show, Eq)
 
 data Type
   = TBoolean

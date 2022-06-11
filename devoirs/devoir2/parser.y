@@ -57,31 +57,12 @@ import Lexer
 
 %%
 
-
-
--- Exemples de la doc
--- Exp   : 'let' var '=' Exp in Exp  { Let $2 $4 $6 }
---       | Exp1                    { Exp1 $1 }
-
--- Exp1  : Exp1 '+' Term           { Plus $1 $3 }
---       | Exp1 '-' Term           { Minus $1 $3 }
---       | Term                    { Term $1 }
-
--- Term  : Term '*' Factor         { Times $1 $3 }
---       | Term '/' Factor         { Div $1 $3 }
---       | Factor                  { Factor $1 }
-
--- Factor  : int                   { Int $1 }
---         | var                   { Var $1 }
---         | '(' Exp ')'           { Brack $2 }
-
-
-
--- Custom depuis ici
+-- Statements
 Statement
     : Expr                                                      { Language.Expr $1 }                      
     | Def                                                       { Language.Def $1 }
 
+-- Expressions
 Expr 
       : FuncApp                                                 { $1 }
       | 'let' Defs 'in' Expr                                    { Language.ELet $2 $4 }
@@ -90,11 +71,12 @@ Expr
       | 'case' Expr 'of' CaseOfPatterns                         { Language.ECaseOf $2 $4 }
       | UnaryOp Expr                                            { Language.EUnary $1 $2 }
       | Expr BinaryOp Expr                                      { Language.EBinary $2 $1 $3 }
+      | '(' Expr ',' Expr ')'                                   { Language.ETuple $2 $4 }
 
+-- Valeurs
 Value
       : 'int'                                                   { Language.VInt $1 }
       | 'bool'                                                  { Language.VBool $1 }
-      | '(' Expr ',' Expr ')'                                   { Language.VTuple $2 $4 }
 
 -- Définition globale
 Defs
@@ -105,7 +87,7 @@ Def
       : VarDef                                                  { $1 }
       | FuncDef                                                 { $1 }
 
--- définition de variables;
+-- Définition de variables;
 VarDef
       : 'var' 'name' '=' Expr                                   { Language.Definition $2 [] $4 }
 
@@ -126,7 +108,7 @@ Params
 Param
       : Type 'name'                                             { Language.Arg $1 $2 }
 
--- applications de fonction;
+-- Applications de fonction;
 FuncApp
       : 'name' '(' FuncArgs ')'                                 { Language.EApp $1 $3 }
 
@@ -134,7 +116,7 @@ FuncArgs
       : Expr                                                    { [$1] }
       | Expr ',' FuncArgs                                       { $1:$3 }
 
--- expressions case-of sans gardes avec motifs universel, variable, littéraux;            
+-- Expressions case-of sans gardes avec motifs universel, variable, littéraux;            
 CaseOfPatterns
       : CaseOfPattern                                           { [$1] }               
       | CaseOfPattern CaseOfPatterns                            { $1:$2 }
@@ -147,7 +129,7 @@ Pattern
       | 'name'                                                  { Language.PVar $1 }
       | '_'                                                     { Language.PUniversal }
 
--- opérations unaires, binaires.
+-- Opérations unaires, binaires.
 UnaryOp
       : '-'                                                     { Language.Operator Language.Arithmetic "-" }
       | '!'                                                     { Language.Operator Language.Logical "!" } 

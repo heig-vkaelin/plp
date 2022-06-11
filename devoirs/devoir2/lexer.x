@@ -16,7 +16,7 @@ $alpha = [a-zA-Z]
 
 tokens :-
   $white+                        ;
-  "--".*                         ;
+  "#".*                          ;
   $digit+                        { \s -> TInt (read s) }
   "Integer" | "Boolean"          { \s -> TType s }
   "True"                         { \s -> TBool True }

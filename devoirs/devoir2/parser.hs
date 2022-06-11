@@ -31,7 +31,7 @@ data HappyAbsSyn t4 t5 t6 t7 t8 t9 t10 t11 t12 t13 t14 t15 t16 t17 t18 t19 t20
 	| HappyAbsSyn20 t20
 
 happyExpList :: Happy_Data_Array.Array Prelude.Int Prelude.Int
-happyExpList = Happy_Data_Array.listArray (0,246) ([0,23600,50176,26,3072,23,1185,0,65024,63,0,0,0,0,0,0,0,0,5900,41216,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12288,92,4740,0,0,4096,2,49920,16389,296,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4096,0,0,0,4,8192,0,0,0,0,16,0,23600,33792,18,0,65528,256,0,0,4096,0,0,0,33,0,65504,19,0,0,0,0,49920,16389,296,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5900,41216,4,0,0,0,49152,368,18960,0,0,1024,0,0,65528,4,0,0,128,0,768,8192,0,12288,92,4740,0,63488,255,0,0,0,256,0,0,32,0,0,4096,0,0,0,0,0,0,0,0,2048,0,0,0,0,0,0,5900,41216,4,0,0,0,0,0,16,0,304,1024,16,0,65336,0,0,65024,191,0,0,0,0,0,0,0,0,0,2048,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1475,10304,1,768,0,0,0,2,0,0,0,0,0,49920,16389,296,0,0,0,0,57344,1023,0,3072,23,1185,0,65024,191,0,32768,4095,0,0,0,0,0
+happyExpList = Happy_Data_Array.listArray (0,246) ([0,23600,50176,26,3072,23,1185,0,65024,63,0,0,0,0,0,0,0,0,5900,41216,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12288,92,4740,0,0,4096,2,49920,16389,296,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4096,0,0,0,4,8192,0,0,0,0,16,0,23600,33792,18,0,65528,256,0,0,4096,0,0,0,33,0,65504,19,0,0,0,0,49920,16389,296,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5900,41216,4,0,0,0,49152,368,18960,0,0,1024,0,0,65528,4,0,0,128,0,768,8192,0,12288,92,4740,0,63488,255,0,0,0,256,0,0,32,0,0,4096,0,0,0,0,0,0,0,0,2048,0,0,0,0,0,0,5900,41216,4,0,0,0,0,0,16,0,304,0,16,0,65336,0,0,65024,191,0,0,0,0,0,0,0,0,0,2048,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1475,10304,1,768,0,0,0,2,0,0,0,0,0,49920,16389,296,0,0,0,0,57344,1023,0,3072,23,1185,0,65024,191,0,32768,4095,0,0,0,0,0
 	])
 
 {-# NOINLINE happyExpListPerState #-}
@@ -121,9 +121,9 @@ action_5 (14) = happyGoto action_4
 action_5 (19) = happyGoto action_5
 action_5 _ = happyFail (happyExpListPerState 5)
 
-action_6 _ = happyReduce_10
+action_6 _ = happyReduce_11
 
-action_7 _ = happyReduce_11
+action_7 _ = happyReduce_12
 
 action_8 _ = happyReduce_35
 
@@ -477,7 +477,6 @@ action_63 _ = happyReduce_28
 action_64 (21) = happyShift action_6
 action_64 (22) = happyShift action_7
 action_64 (25) = happyShift action_70
-action_64 (43) = happyShift action_12
 action_64 (53) = happyShift action_71
 action_64 (6) = happyGoto action_68
 action_64 (18) = happyGoto action_69
@@ -516,7 +515,7 @@ action_66 (44) = happyShift action_67
 action_66 (20) = happyGoto action_30
 action_66 _ = happyFail (happyExpListPerState 66)
 
-action_67 _ = happyReduce_12
+action_67 _ = happyReduce_10
 
 action_68 _ = happyReduce_31
 
@@ -716,30 +715,30 @@ happyReduction_9 (HappyAbsSyn5  happy_var_3)
 	)
 happyReduction_9 _ _ _  = notHappyAtAll 
 
-happyReduce_10 = happySpecReduce_1  6 happyReduction_10
-happyReduction_10 (HappyTerminal (Lexer.TInt happy_var_1))
-	 =  HappyAbsSyn6
-		 (Language.VInt happy_var_1
-	)
-happyReduction_10 _  = notHappyAtAll 
-
-happyReduce_11 = happySpecReduce_1  6 happyReduction_11
-happyReduction_11 (HappyTerminal (Lexer.TBool happy_var_1))
-	 =  HappyAbsSyn6
-		 (Language.VBool happy_var_1
-	)
-happyReduction_11 _  = notHappyAtAll 
-
-happyReduce_12 = happyReduce 5 6 happyReduction_12
-happyReduction_12 (_ `HappyStk`
+happyReduce_10 = happyReduce 5 5 happyReduction_10
+happyReduction_10 (_ `HappyStk`
 	(HappyAbsSyn5  happy_var_4) `HappyStk`
 	_ `HappyStk`
 	(HappyAbsSyn5  happy_var_2) `HappyStk`
 	_ `HappyStk`
 	happyRest)
-	 = HappyAbsSyn6
-		 (Language.VTuple happy_var_2 happy_var_4
+	 = HappyAbsSyn5
+		 (Language.ETuple happy_var_2 happy_var_4
 	) `HappyStk` happyRest
+
+happyReduce_11 = happySpecReduce_1  6 happyReduction_11
+happyReduction_11 (HappyTerminal (Lexer.TInt happy_var_1))
+	 =  HappyAbsSyn6
+		 (Language.VInt happy_var_1
+	)
+happyReduction_11 _  = notHappyAtAll 
+
+happyReduce_12 = happySpecReduce_1  6 happyReduction_12
+happyReduction_12 (HappyTerminal (Lexer.TBool happy_var_1))
+	 =  HappyAbsSyn6
+		 (Language.VBool happy_var_1
+	)
+happyReduction_12 _  = notHappyAtAll 
 
 happyReduce_13 = happySpecReduce_1  7 happyReduction_13
 happyReduction_13 (HappyAbsSyn8  happy_var_1)
