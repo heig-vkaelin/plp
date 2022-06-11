@@ -24,6 +24,8 @@ eval (Def def) env = Left $ evalDef def env
 -- Expressions
 -- -----------------------
 evalExpr :: Expr -> Env -> Value
+evalExpr (EApp name args) env = evalApp name args env
+evalExpr (ELet defs expr) env = evalExpr expr (evalDefs defs env)
 evalExpr (EVar v) env = value v env
 evalExpr (EValue v) env = v
 evalExpr (EBinary op x y) env = evalBinary op (evalExpr x env) (evalExpr y env) env
@@ -104,19 +106,35 @@ evalUnary (Operator Logical op) x env =
         _ -> error "Eval error: Logical Operation invalid"
 evalUnary _ _ _ = error "Eval error: Unary Operation invalid"
 
--- TODO: Let
-
 -- TODO: Case
 
--- TODO: Application de fonction
+-- Application de fonction
+evalApp :: Name -> [Expr] -> Env -> Value
+evalApp name args env =
+  case value name env of
+    (VFunc body params env') -> evalExpr body env''
+      where
+        env'' = populateArgs params args env'
+    _ -> error "Eval error: invalid function application"
+
+populateArgs :: [Arg] -> [Expr] -> Env -> Env
+populateArgs (arg : args) (expr : exprs) env = populateArgs args exprs (populateArg arg expr env)
+populateArgs _ _ env = env
+
+populateArg :: Arg -> Expr -> Env -> Env
+populateArg (Arg _ name) expr env = (name, evalExpr expr env) : env
 
 -- -----------------------
 -- Définitions
 -- -----------------------
+evalDefs :: [Definition] -> Env -> Env
+evalDefs defs env = foldr evalDef env defs
+
 evalDef :: Definition -> Env -> Env
-evalDef (Definition id args expr) env = case args of
-  [] -> (id, evalExpr expr env) : env -- Variable / Function sans paramètres
-  _ -> (id, VFunc expr args env) : env -- Function avec paramètres
+evalDef (Definition name args body) env =
+  case args of
+    [] -> (name, evalExpr body env) : env -- Variable et fonctions sans param
+    _ -> (name, VFunc body args env) : env -- Fonctions avec params
 
 -- pour tester:
 -- eval (parser $ lexer "5") []
@@ -145,3 +163,7 @@ evalDef (Definition id args expr) env = case args of
 
 -- eval (parser $ lexer "var x = 2") []
 -- eval (parser $ lexer "func x (Integer y) = y * 2") []
+
+-- eval (parser $ lexer $ "let func f(Integer x) = 2 * x in f(2)") []
+-- eval (parser $ lexer "let func x () = 3 in 3 * 3") []
+-- eval (parser $ lexer "let func x (Integer y) = 3 in 3 * 3") []
