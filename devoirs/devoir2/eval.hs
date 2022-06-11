@@ -28,9 +28,9 @@ evalExpr (EApp name args) env = evalApp name args env
 evalExpr (ELet defs expr) env = evalExpr expr (evalDefs defs env)
 evalExpr (EVar v) env = value v env
 evalExpr (EValue v) env = v
+evalExpr (ECaseOf expr cases) env = evalCaseOf expr cases env
 evalExpr (EBinary op x y) env = evalBinary op (evalExpr x env) (evalExpr y env) env
 evalExpr (EUnary op x) env = evalUnary op (evalExpr x env) env
-evalExpr _ _ = error "TODO"
 
 -- Opérations binaires
 evalBinary :: Operator -> Value -> Value -> Env -> Value
@@ -106,7 +106,30 @@ evalUnary (Operator Logical op) x env =
         _ -> error "Eval error: Logical Operation invalid"
 evalUnary _ _ _ = error "Eval error: Unary Operation invalid"
 
--- TODO: Case
+-- Case
+evalCaseOf :: Expr -> [(Pattern, Expr)] -> Env -> Value
+evalCaseOf expr cases@((pattern, value) : xs) env =
+  case pattern of
+    PUniversal -> evalExpr value env
+    _ -> checkPattern' cases
+  where
+    checkPattern' :: [(Pattern, Expr)] -> Value
+    checkPattern' [] = error "Eval error: no pattern match"
+    checkPattern' ((pattern', value') : xs')
+      | compareValues (evalExpr expr env) (evalPattern pattern' env) env = evalExpr value' env
+      | otherwise = evalCaseOf expr xs' env
+evalCaseOf _ _ _ = error "Eval error: no pattern match"
+
+evalPattern :: Pattern -> Env -> Value
+evalPattern (PVar v) env = value v env
+evalPattern (PValue v) env = v
+evalPattern _ _ = error "Eval error: impossible pattern"
+
+compareValues :: Value -> Value -> Env -> Bool
+compareValues (VInt a) (VInt b) _ = a == b
+compareValues (VBool a) (VBool b) _ = a == b
+compareValues (VTuple a b) (VTuple c d) env = compareValues (evalExpr a env) (evalExpr c env) env && compareValues (evalExpr b env) (evalExpr d env) env
+compareValues _ _ _ = False
 
 -- Application de fonction
 evalApp :: Name -> [Expr] -> Env -> Value
@@ -165,5 +188,9 @@ evalDef (Definition name args body) env =
 -- eval (parser $ lexer "func x (Integer y) = y * 2") []
 
 -- eval (parser $ lexer $ "let func f(Integer x) = 2 * x in f(2)") []
+-- eval (parser $ lexer $ "let func f() = 3 in 2 * f") []
 -- eval (parser $ lexer "let func x () = 3 in 3 * 3") []
 -- eval (parser $ lexer "let func x (Integer y) = 3 in 3 * 3") []
+
+-- eval (parser $ lexer "case 3 * 3 of (6 -> 2) (_ -> 3) (_ -> 1)") []
+-- eval (parser $ lexer "case 3 * 3 of (6 -> 2) (x -> 3) (_ -> 1)") [("x", VInt 9)]
