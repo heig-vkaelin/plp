@@ -59,10 +59,9 @@ typeofBinary (Operator Arithmetic _) x y env =
     _ -> error "Type error: Arithmetic Operation invalid"
 -- Expressions Comparaisons
 typeofBinary (Operator Comparison _) x y env =
-  case (typeofExpr x env, typeofExpr y env) of
-    (TInteger, TInteger) -> TBoolean
-    (TBoolean, TBoolean) -> TBoolean
-    _ -> error "Type error: Comparison Operation invalid"
+  if typeofExpr x env == typeofExpr y env
+    then TBoolean
+    else error "Type error: Comparison Operation invalid"
 -- Expressions relationnelles
 typeofBinary (Operator Relational _) x y env =
   case (typeofExpr x env, typeofExpr y env) of
@@ -138,6 +137,8 @@ typeofDef (Definition x ((Arg type' name) : args) body) env = typeofDef (Definit
 -- typeof (parser $ lexer $ "(1, (True, 172))") []
 
 -- typeof (parser $ lexer $ "let var x = 2 var y = 3 in x * y * 2") []
+-- typeof (parser $ lexer $ "let var x = 2 var y = 3 in x == y") []
+-- typeof (parser $ lexer $ "let var x = (1, True) var y = (3, False) in x == y") []
 
 -- typeof (parser $ lexer $ "let func x (Integer z) = z + 2 var y = 3 in x(3) * y * 2") []
 
