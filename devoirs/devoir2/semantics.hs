@@ -8,34 +8,32 @@ import Parser
 -- -----------------------
 -- Environment
 -- -----------------------
-type Env = [(Name, Type)]
-
-getType :: Name -> Env -> Type
+getType :: Name -> TEnv -> Type
 getType name env = case lookup name env of
   Just t -> t
   Nothing -> error $ name ++ " not found"
 
-addToEnv :: Definition -> Env -> Env
+addToEnv :: Definition -> TEnv -> TEnv
 addToEnv (Definition name [] expr) env = (name, typeofExpr expr env) : env -- Variables
 addToEnv (Definition name args expr) env = (name, TFunc (typeofExpr expr env') args') : env -- Fonctions
   where
     env' = foldl (\env (Arg t name) -> (name, t) : env) env args
     args' = map (\(Arg t name) -> t) args
 
-addAllToEnv :: [Definition] -> Env -> Env
+addAllToEnv :: [Definition] -> TEnv -> TEnv
 addAllToEnv defs env = foldr addToEnv env defs
 
 -- -----------------------
 -- Statements
 -- -----------------------
-typeof :: Statement -> Env -> Type
+typeof :: Statement -> TEnv -> Type
 typeof (Expr e) env = typeofExpr e env
 typeof (Def d) env = typeofDef d env
 
 -- -----------------------
 -- Expressions
 -- -----------------------
-typeofExpr :: Expr -> Env -> Type
+typeofExpr :: Expr -> TEnv -> Type
 typeofExpr (EApp name args) env = typeofApp name args env
 typeofExpr (ELet defs e) env = typeofLet defs e env
 typeofExpr (EVar name) env = getType name env
@@ -43,16 +41,16 @@ typeofExpr (EValue v) env = typeofValue v env
 typeofExpr (ECaseOf e cases) env = typeofCaseOf e cases env
 typeofExpr (EBinary op x y) env = typeofBinary op x y env
 typeofExpr (EUnary op x) env = typeofUnary op x env
-typeofExpr (ETuple x y) env = TTuple (typeofExpr x env) (typeofExpr y env)
 
 -- Valeurs / Littéraux
-typeofValue :: Value -> Env -> Type
+typeofValue :: Value -> TEnv -> Type
 typeofValue (VInt _) env = TInteger
 typeofValue (VBool _) env = TBoolean
-typeofValue (VTuple x y) env = TTuple (typeofValue x env) (typeofValue y env)
+typeofValue (VTuple x y) env = TTuple (typeofExpr x env) (typeofExpr y env)
+typeofValue _ _ = error "Unknown value"
 
 -- Opérations arithmétiques
-typeofBinary :: Operator -> Expr -> Expr -> Env -> Type
+typeofBinary :: Operator -> Expr -> Expr -> TEnv -> Type
 typeofBinary (Operator Arithmetic _) x y env =
   case (typeofExpr x env, typeofExpr y env) of
     (TInteger, TInteger) -> TInteger
@@ -74,7 +72,7 @@ typeofBinary (Operator Logical _) x y env =
     _ -> error "Type error: Logical Operation invalid"
 
 -- Opérations unaires
-typeofUnary :: Operator -> Expr -> Env -> Type
+typeofUnary :: Operator -> Expr -> TEnv -> Type
 typeofUnary (Operator Arithmetic _) x env =
   case typeofExpr x env of
     TInteger -> TInteger
@@ -86,13 +84,13 @@ typeofUnary (Operator Logical _) x env =
 typeofUnary _ _ _ = error "Type error: Unary Operation invalid"
 
 -- Let
-typeofLet :: [Definition] -> Expr -> Env -> Type
+typeofLet :: [Definition] -> Expr -> TEnv -> Type
 typeofLet defs body env = typeofExpr body env'
   where
     env' = addAllToEnv defs env
 
 -- Case
-typeofCaseOf :: Expr -> [(Pattern, Expr)] -> Env -> Type
+typeofCaseOf :: Expr -> [(Pattern, Expr)] -> TEnv -> Type
 typeofCaseOf cond cases env =
   if any (\(p, e) -> (p /= condType && p /= Language.TUniversal) || e /= exprType) typedCases
     then error "Type error: Case Operation invalid"
@@ -102,13 +100,13 @@ typeofCaseOf cond cases env =
     typedCases = map (\(p, e) -> (typeOfPattern p env, typeofExpr e env)) cases
     exprType = snd $ head typedCases
 
-typeOfPattern :: Pattern -> Env -> Type
+typeOfPattern :: Pattern -> TEnv -> Type
 typeOfPattern (PVar x) env = getType x env
 typeOfPattern (PValue x) env = typeofValue x env
 typeOfPattern PUniversal env = Language.TUniversal
 
 -- Application de fonction
-typeofApp :: Name -> [Expr] -> Env -> Type
+typeofApp :: Name -> [Expr] -> TEnv -> Type
 typeofApp name args env =
   case lookup name env of
     Just (TFunc t args') ->
@@ -120,7 +118,7 @@ typeofApp name args env =
 -- -----------------------
 -- Définitions
 -- -----------------------
-typeofDef :: Definition -> Env -> Type
+typeofDef :: Definition -> TEnv -> Type
 typeofDef (Definition x [] body) env = typeofExpr body env
 typeofDef (Definition x ((Arg type' name) : args) body) env = typeofDef (Definition x args body) env'
   where

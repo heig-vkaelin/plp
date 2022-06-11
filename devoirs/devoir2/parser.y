@@ -71,12 +71,12 @@ Expr
       | 'case' Expr 'of' CaseOfPatterns                         { Language.ECaseOf $2 $4 }
       | UnaryOp Expr                                            { Language.EUnary $1 $2 }
       | Expr BinaryOp Expr                                      { Language.EBinary $2 $1 $3 }
-      | '(' Expr ',' Expr ')'                                   { Language.ETuple $2 $4 }
 
 -- Valeurs
 Value
       : 'int'                                                   { Language.VInt $1 }
       | 'bool'                                                  { Language.VBool $1 }
+      | '(' Expr ',' Expr ')'                                   { Language.VTuple $2 $4 }
 
 -- Définition globale
 Defs

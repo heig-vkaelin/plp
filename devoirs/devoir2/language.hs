@@ -2,6 +2,10 @@ module Language where
 
 type Name = String
 
+type TEnv = [(Name, Type)]
+
+type Env = [(Name, Value)]
+
 data Statement
   = Def Definition
   | Expr Expr
@@ -15,7 +19,6 @@ data Expr
   | ECaseOf Expr [(Pattern, Expr)]
   | EUnary Operator Expr
   | EBinary Operator Expr Expr
-  | ETuple Expr Expr
   deriving (Show)
 
 data Operator
@@ -46,8 +49,9 @@ data Arg
 data Value
   = VBool Bool
   | VInt Int
-  | VTuple Value Value
-  deriving (Show, Eq)
+  | VTuple Expr Expr
+  | VFunc Expr [Arg] Env
+  deriving (Show)
 
 data Type
   = TBoolean

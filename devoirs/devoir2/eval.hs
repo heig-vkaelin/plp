@@ -7,8 +7,6 @@ import Parser
 -- -----------------------
 -- Environment
 -- -----------------------
-type Env = [(Name, Value)]
-
 value :: Name -> Env -> Value
 value v [] = error $ v ++ " not found (value)"
 value v ((var, val) : env)
@@ -30,7 +28,6 @@ evalExpr (EVar v) env = value v env
 evalExpr (EValue v) env = v
 evalExpr (EBinary op x y) env = evalBinary op (evalExpr x env) (evalExpr y env) env
 evalExpr (EUnary op x) env = evalUnary op (evalExpr x env) env
-evalExpr (ETuple x y) env = VTuple (evalExpr x env) (evalExpr y env)
 evalExpr _ _ = error "TODO"
 
 -- Opérations binaires
@@ -39,11 +36,23 @@ evalBinary (Operator Arithmetic op) x y env =
   case (x, y) of
     (VInt a, VInt b) -> evalArithmetic op a b
     _ -> error "Error: invalid arithmetic types"
+  where
+    evalArithmetic op x y =
+      case op of
+        "+" -> VInt $ x + y
+        "-" -> VInt $ x - y
+        "*" -> VInt $ x * y
+        "/" -> if y == 0 then error "Error: Division by 0 is impossible" else VInt $ x `div` y
+        "%" -> VInt $ x `mod` y
+        _ -> error "Eval error: Arithmetic Operation invalid"
 evalBinary (Operator Comparison op) x y env =
   case (x, y) of
     (VInt a, VInt b) -> VBool (toComparison op a b)
     (VBool a, VBool b) -> VBool (toComparison op a b)
-    (VTuple a b, VTuple c d) -> VBool (toComparison op a c && toComparison op b d)
+    (VTuple a b, VTuple c d) -> evalExpr (EBinary (Operator Comparison op) (EValue v1) (EValue v2)) env
+      where
+        v1 = evalExpr (EBinary (Operator Comparison op) a c) env
+        v2 = evalExpr (EBinary (Operator Comparison op) b d) env
     _ -> error "TODO"
 evalBinary (Operator Relational op) x y env =
   case (x, y) of
@@ -53,16 +62,6 @@ evalBinary (Operator Logical op) x y env =
   case (x, y) of
     (VBool a, VBool b) -> VBool (toLogical op a b)
     _ -> error "Error: invalid comparison types"
-
-evalArithmetic :: String -> Int -> Int -> Value
-evalArithmetic op x y =
-  case op of
-    "+" -> VInt $ x + y
-    "-" -> VInt $ x - y
-    "*" -> VInt $ x * y
-    "/" -> if y == 0 then error "Error: Division by 0 is impossible" else VInt $ x `div` y
-    "%" -> VInt $ x `mod` y
-    _ -> error "Eval error: Arithmetic Operation invalid"
 
 toComparison :: Eq a => [Char] -> a -> a -> Bool
 toComparison "==" = (==)
@@ -105,22 +104,19 @@ evalUnary (Operator Logical op) x env =
         _ -> error "Eval error: Logical Operation invalid"
 evalUnary _ _ _ = error "Eval error: Unary Operation invalid"
 
--- -- Expressions relationnelles
--- typeofBinary (Operator Relational _) x y env =
---   case (typeofExpr x env, typeofExpr y env) of
---     (TInteger, TInteger) -> TBoolean
---     _ -> error "Type error: Relational Operation invalid"
--- -- Expressions logiques
--- typeofBinary (Operator Logical _) x y env =
---   case (typeofExpr x env, typeofExpr y env) of
---     (TBoolean, TBoolean) -> TBoolean
---     _ -> error "Type error: Logical Operation invalid"
+-- TODO: Let
+
+-- TODO: Case
+
+-- TODO: Application de fonction
 
 -- -----------------------
 -- Définitions
 -- -----------------------
 evalDef :: Definition -> Env -> Env
-evalDef _ _ = error "TODO"
+evalDef (Definition id args expr) env = case args of
+  [] -> (id, evalExpr expr env) : env -- Variable / Function sans paramètres
+  _ -> (id, VFunc expr args env) : env -- Function avec paramètres
 
 -- pour tester:
 -- eval (parser $ lexer "5") []
@@ -132,7 +128,8 @@ evalDef _ _ = error "TODO"
 -- eval (parser $ lexer "x == 6") [("x", VInt 6)]
 -- eval (parser $ lexer "x != 6") [("x", VInt 6)]
 
--- eval (parser $ lexer "x == (6, 7)") [("x", VTuple (VInt 6) (VInt 7))]
+-- eval (parser $ lexer "x == (6, 7)") [("x", VTuple (EValue (VInt 6)) (EValue (VInt 7)))]
+-- eval (parser $ lexer "x == ((1, 2), (3, 4))") [("x", VTuple (EValue (VTuple (EValue (VInt 1)) (EValue (VInt 2)))) (EValue (VTuple (EValue (VInt 3)) (EValue (VInt 4)))))]
 
 -- eval (parser $ lexer "(2, 3) == (6, 7)") []
 -- eval (parser $ lexer "(2, 3) == (2, 3)") []
@@ -145,3 +142,6 @@ evalDef _ _ = error "TODO"
 -- eval (parser $ lexer "--x") [("x", VInt 3)]
 -- eval (parser $ lexer "!x") [("x", VBool True)]
 -- eval (parser $ lexer "!x") [("x", VBool False)]
+
+-- eval (parser $ lexer "var x = 2") []
+-- eval (parser $ lexer "func x (Integer y) = y * 2") []
