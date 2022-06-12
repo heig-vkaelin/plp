@@ -53,6 +53,14 @@ data Value
   | VFunc Expr [Arg] Env
   deriving (Show)
 
+-- TODO
+-- instance Show Value where
+--   show (VInt i) = show i
+--   show (VBool b) = show b
+--   show (VTuple e1 e2) = "(" ++ show e1 ++ "," ++ show e2 ++ ")"
+--   show (VFunc e args env) =
+-- "(" ++ show e ++ " " ++ show args ++ " " ++ show env ++ ")"
+
 data Type
   = TBoolean
   | TInteger

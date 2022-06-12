@@ -26,8 +26,8 @@ addAllToEnv defs env = foldr addToEnv env defs
 -- -----------------------
 -- Statements
 -- -----------------------
-typeof :: Statement -> TEnv -> Type
-typeof (Expr e) env = typeofExpr e env
+typeof :: Statement -> TEnv -> (TEnv, Type)
+typeof (Expr e) env = ([], typeofExpr e env)
 typeof (Def d) env = typeofDef d env
 
 -- -----------------------
@@ -118,11 +118,10 @@ typeofApp name args env =
 -- -----------------------
 -- Définitions
 -- -----------------------
-typeofDef :: Definition -> TEnv -> Type
-typeofDef (Definition x [] body) env = typeofExpr body env
-typeofDef (Definition x ((Arg type' name) : args) body) env = typeofDef (Definition x args body) env'
+typeofDef :: Definition -> [(Name, Type)] -> (TEnv, Type)
+typeofDef def@(Definition name args expr) env = (env', getType name env')
   where
-    env' = (name, type') : env
+    env' = addToEnv def env
 
 -- Pour tester:
 -- typeof (parser $ lexer $ "var x = True") []

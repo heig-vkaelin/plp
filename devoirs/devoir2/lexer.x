@@ -12,8 +12,6 @@ $digit = 0-9
 $lower = a-z
 $alpha = [a-zA-Z]
 
--- TODO: add type before arguments in function calls
-
 tokens :-
   $white+                        ;
   "#".*                          ;

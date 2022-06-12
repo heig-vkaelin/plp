@@ -1,4 +1,4 @@
-module Evaluation (eval) where
+module Eval (eval) where
 
 import Language
 import Lexer
@@ -55,7 +55,7 @@ evalBinary (Operator Comparison op) x y env =
       where
         v1 = evalExpr (EBinary (Operator Comparison op) a c) env
         v2 = evalExpr (EBinary (Operator Comparison op) b d) env
-    _ -> error "TODO"
+    _ -> error "Eval error: Comparison Operation invalid"
 evalBinary (Operator Relational op) x y env =
   case (x, y) of
     (VInt a, VInt b) -> VBool (toRelational op a b)

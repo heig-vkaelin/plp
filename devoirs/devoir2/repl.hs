@@ -1,3 +1,9 @@
+import Control.Exception
+import Eval
+import Language
+import Lexer
+import Parser
+import Semantics
 import Text.Printf (printf)
 
 -- Programme qui implémente une boucle de lecture-évaluation-impression (REPL).
@@ -7,34 +13,55 @@ import Text.Printf (printf)
 -- Auteurs: Jonathan Friedli et Valentin Kaelin
 -- Date de dernière modification: 06 juin 2022
 
+-- Environnement
+data State
+  = ValidState TEnv Env
+  | InvalidState TEnv Env String
+
+initEnv :: State
+initEnv = ValidState [] []
+
 -- Fonction principale du programme
 main :: IO ()
 main = do
-    putStrLn startingMessage
-    getInput
+  putStrLn startingMessage
+  repl initEnv
 
--- Récupération de l'input
-getInput :: IO ()
-getInput = do
+-- parseCmd str = g
+--   where
+--     stmt = parseStmt str
+--     (t, newTEnv) = typeof stmt tEnv
+--     g = case eval stmt env of
+--       Left env' -> Left $ ValidState newTEnv env'
+--       Right val -> Right $ print val
+
+repl :: State -> IO ()
+repl (InvalidState oldTEnv oldEnv msg) = putStrLn msg >> repl (ValidState oldTEnv oldEnv)
+repl state@(ValidState tEnv env) = do
   s <- getLine
-  if s == ":q"
-    then putStrLn "Au revoir"
-    else do
-    checkInput s
-    getInput
+  case s of
+    ":q" -> putStrLn "Au revoir"
+    ":r" -> repl initEnv
+    ":{" -> putStrLn ":{" >> repl state
+    ":}" -> putStrLn ":}" >> repl state
+    (':' : 't' : ' ' : rest) -> tryTypeOf rest tEnv >> repl state
+    ":e" -> print env >> print tEnv >> repl state
+    ":h" -> help >> repl state
+    input -> case eval stmt env of
+      Left env' -> repl (ValidState tEnv' env')
+      Right value -> print value >> repl state
+      where
+        stmt = parseStmt input
+        (tEnv', t) = typeof stmt tEnv
 
--- Vérification de l'input
-checkInput :: String -> IO ()
-checkInput input
-  | input == ":{" = putStrLn ":{"
-  | input == ":}" = putStrLn ":}"
-  | input == ":r" = putStrLn ":r"
-  | input == ":t" = putStrLn ":t"
-  | input == ":e" = putStrLn ":e"
-  | input == ":h" = help
-  | otherwise = putStrLn "Input invalide"
+parseStmt stmt = parser $ lexer stmt
 
--- Affiche l'aide
+tryTypeOf str tEnv = catch (print $ snd (typeof (parseStmt str) tEnv)) handler
+
+handler :: SomeException -> IO ()
+handler = print
+
+-- Affichage de l'aide
 help :: IO ()
 help = do
   putStrLn "---------------------------------------------------------------------------------"
