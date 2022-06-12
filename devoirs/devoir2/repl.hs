@@ -8,7 +8,7 @@ import Text.Printf (printf)
 
 -- Programme qui implémente une boucle de lecture-évaluation-impression (REPL).
 -- Une entrée utilisateur donnée doit valider toutes les phases d’analyse avant
--- de pouvoir évaluer le terme qui en découle. De plus, le programme doit maintenir à jour
+-- de pouvoir évaluer le terme qui en découle. De plus, le programme maintient à jour
 -- un environnement global.
 -- Auteurs: Jonathan Friedli et Valentin Kaelin
 -- Date de dernière modification: 06 juin 2022
@@ -27,35 +27,30 @@ main = do
   putStrLn startingMessage
   repl initEnv
 
--- parseCmd str = g
---   where
---     stmt = parseStmt str
---     (t, newTEnv) = typeof stmt tEnv
---     g = case eval stmt env of
---       Left env' -> Left $ ValidState newTEnv env'
---       Right val -> Right $ print val
-
 repl :: State -> IO ()
 repl (InvalidState oldTEnv oldEnv msg) = putStrLn msg >> repl (ValidState oldTEnv oldEnv)
 repl state@(ValidState tEnv env) = do
-  s <- getLine
-  case s of
+  line <- getLine
+  case line of
     ":q" -> putStrLn "Au revoir"
     ":r" -> repl initEnv
-    ":{" -> putStrLn ":{" >> repl state
-    ":}" -> putStrLn ":}" >> repl state
+    ":{" -> putStrLn ":{" >> repl state -- TODO
+    ":}" -> putStrLn ":}" >> repl state -- TODO
     (':' : 't' : ' ' : rest) -> tryTypeOf rest tEnv >> repl state
     ":e" -> print env >> print tEnv >> repl state
     ":h" -> help >> repl state
-    input -> case eval stmt env of
-      Left env' -> repl (ValidState tEnv' env')
-      Right value -> print value >> repl state
+    _ ->
+      case semantic `seq` eval stmt env of -- utilisation de seq pour forcer le typeOf avant l'evaluation
+        Left env' -> repl (ValidState tEnv' env')
+        Right value -> print value >> repl state
       where
-        stmt = parseStmt input
-        (tEnv', t) = typeof stmt tEnv
+        stmt = parseStmt line
+        semantic@(tEnv', t) = typeof stmt tEnv
 
+parseStmt :: String -> Statement
 parseStmt stmt = parser $ lexer stmt
 
+tryTypeOf :: String -> TEnv -> IO ()
 tryTypeOf str tEnv = catch (print $ snd (typeof (parseStmt str) tEnv)) handler
 
 handler :: SomeException -> IO ()
