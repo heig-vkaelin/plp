@@ -39,13 +39,17 @@ repl state@(ValidState tEnv env) = do
     (':' : 't' : ' ' : rest) -> tryTypeOf rest tEnv >> repl state
     ":e" -> print env >> print tEnv >> repl state
     ":h" -> help >> repl state
-    _ ->
-      case semantic `seq` eval stmt env of -- utilisation de seq pour forcer le typeOf avant l'evaluation
-        Left env' -> repl (ValidState tEnv' env')
-        Right value -> print value >> repl state
-      where
-        stmt = parseStmt line
-        semantic@(tEnv', t) = typeof stmt tEnv
+    _ -> do
+      catch
+        ( do
+            stmt <- evaluate (parseStmt line)
+            semantic@(tEnv', t) <- evaluate (typeof stmt tEnv)
+            case eval stmt env of
+              Left env' -> repl (ValidState tEnv' env')
+              Right value -> print value >> repl state
+        )
+        handler
+      repl state
 
 parseStmt :: String -> Statement
 parseStmt stmt = parser $ lexer stmt
