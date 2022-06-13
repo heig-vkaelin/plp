@@ -1,6 +1,11 @@
 -- Grammaire dans le style EBNF de notre langage de programmation fonctionnelle
 -- Auteurs: Jonathan Friedli et Valentin Kaelin
--- Date dernière modification: 07 juin 2022
+-- Date dernière modification: 13 juin 2022
+
+
+-- -----------------------
+-- Utilitaires
+-- -----------------------
 
 -- littéraux entiers, booléens, tuples;
 LetterUppercase -> [A-Z]
@@ -13,9 +18,26 @@ Bool -> True | False
 Universal -> _
 
 Tuple -> '(' Expr ',' Expr ')'
-Value -> Int | Bool | Tuple
 
--- définition de variables;
+
+-- -----------------------
+-- Point d'entrée du programme
+-- -----------------------
+
+Statement -> {Expr | Def}
+
+
+-- -----------------------
+-- Définitions
+-- -----------------------
+
+-- Définitions
+Defs -> {Def}
+
+-- Définition globale
+Def -> VarDef | FuncDef
+
+-- Définition de variables;
 NameDef -> ['_']LetterLowercase{Alphanumeric}
 VarDef -> 'var' NameDef '=' Expr
 
@@ -25,29 +47,10 @@ Params -> Type NameDef | TypedTuple
 Type -> 'Integer' | 'Boolean' | TypedTuple
 TypedTuple -> '(' Params ',' Params ')'
 
--- Définition globale
-Def -> VarDef | FuncDef
 
--- occurrences de variable;
-Var -> NameDef
-
--- applications de fonction;
--- Note: les fonctions à un seul paramètre sont traitées comme de simples variables
-FuncApp -> NameDef '(' FuncArgs ')'
-FuncArgs -> Expr | FuncArgs ',' Expr
-
--- expressions let-in avec plusieurs définitions; 
-LetIn -> 'let' {Def} 'in' Expr
-
--- expressions case-of sans gardes avec motifs universel, variable, littéraux;
--- Information: les variables dans les patternes doivent être déclarées avant le case, contrairement à Haskell par exemple
-CaseOf -> 'case' Expr 'of' CaseOfPatterns
-CaseOfPatterns -> {'(' Pattern  '->' Expr ')'}
-Pattern -> Value | Var | Universal
-
--- opérations unaires, binaires.
-UnaryOp -> '-' | '!' | '++' | '--'
-BinaryOp -> '+' | '-' | '*' | '/' | '%' | '>' | '<' | '>=' | '<=' | '==' | '!=' | '&&' | '||'
+-- -----------------------
+-- Expressions
+-- -----------------------
 
 Expr -> 
     Value
@@ -58,5 +61,26 @@ Expr ->
   | UnaryOp Expr
   | Expr BinaryOp Expr
 
--- Point d'entrée du programme
-App -> {Expr | Def}
+-- Valeurs
+Value -> Int | Bool | Tuple
+
+-- Occurrences de variable;
+Var -> NameDef
+
+-- Applications de fonction;
+-- Note: les fonctions à un seul paramètre sont traitées comme de simples variables
+FuncApp -> NameDef '(' FuncArgs ')'
+FuncArgs -> Expr | FuncArgs ',' Expr
+
+-- Expressions let-in avec plusieurs définitions; 
+LetIn -> 'let' {Def} 'in' Expr
+
+-- Case-of sans gardes avec motifs universel, variable, littéraux;
+-- Note: les variables dans les patternes doivent être déclarées avant le case, contrairement à Haskell par exemple
+CaseOf -> 'case' Expr 'of' CaseOfPatterns
+CaseOfPatterns -> {'(' Pattern  '->' Expr ')'}
+Pattern -> Value | Var | Universal
+
+-- opérations unaires, binaires.
+UnaryOp -> '-' | '!' | '++' | '--'
+BinaryOp -> '+' | '-' | '*' | '/' | '%' | '>' | '<' | '>=' | '<=' | '==' | '!=' | '&&' | '||'
