@@ -44,8 +44,10 @@ repl state@(ValidState tEnv env) = do
         ( do
             stmt <- evaluate (parseStmt line)
             semantic@(tEnv', t) <- evaluate (typeof stmt tEnv)
-            case eval stmt env of
-              Left env' -> repl (ValidState tEnv' env')
+            -- astuce pour forcer l'évaluation du typeof avant le eval
+            let tEnv'' = if t == Language.TUniversal then tEnv' else tEnv'
+            case tEnv' `seq` eval stmt env of
+              Left env' -> repl (ValidState tEnv'' env')
               Right value -> print value >> repl state
         )
         handler
