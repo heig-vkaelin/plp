@@ -34,24 +34,40 @@ repl state@(ValidState tEnv env) = do
   case line of
     ":q" -> putStrLn "Au revoir"
     ":r" -> repl initEnv
-    ":{" -> putStrLn ":{" >> repl state -- TODO
-    ":}" -> putStrLn ":}" >> repl state -- TODO
+    ":{" -> do
+      content <- readUntil (== ":}")
+      applyLinePerLine content state
+      where
+        applyLinePerLine [] state' = repl state'
+        applyLinePerLine (line : rest) state' = do
+          state'' <- applyEvaluate line state'
+          applyLinePerLine rest state''
     (':' : 't' : ' ' : rest) -> tryTypeOf rest tEnv >> repl state
     ":e" -> print env >> print tEnv >> repl state
     ":h" -> help >> repl state
     _ -> do
-      catch
-        ( do
-            stmt <- evaluate (parseStmt line)
-            semantic@(tEnv', t) <- evaluate (typeof stmt tEnv)
-            -- astuce pour forcer l'évaluation du typeof avant le eval
-            let tEnv'' = if t == Language.TUniversal then tEnv' else tEnv'
-            case tEnv' `seq` eval stmt env of
-              Left env' -> repl (ValidState tEnv'' env')
-              Right value -> print value >> repl state
-        )
-        handler
-      repl state
+      state' <- applyEvaluate line state
+      repl state'
+
+applyEvaluate :: String -> State -> IO State
+applyEvaluate line state@(ValidState tEnv env) = do
+  catch
+    ( do
+        stmt <- evaluate (parseStmt line)
+        semantic@(tEnv', t) <- evaluate (typeof stmt tEnv)
+        -- astuce pour forcer l'évaluation du typeof avant le eval
+        let tEnv'' = if t == Language.TUniversal then tEnv' else tEnv'
+        case tEnv'' `seq` eval stmt env of
+          Left env' -> return (ValidState tEnv'' env')
+          Right value -> print value >> return state
+    )
+    handler
+  where
+    handler :: SomeException -> IO State
+    handler error = do
+      print error
+      return state
+applyEvaluate _ _ = error "applyEvaluate: impossible"
 
 parseStmt :: String -> Statement
 parseStmt stmt = parser $ lexer stmt
@@ -61,6 +77,17 @@ tryTypeOf str tEnv = catch (print $ snd (typeof (parseStmt str) tEnv)) handler
 
 handler :: SomeException -> IO ()
 handler = print
+
+-- Source: https://stackoverflow.com/a/49968517
+collectUntil :: (Monad m) => m a -> (a -> Bool) -> m [a]
+collectUntil act f = do
+  x <- act
+  if f x
+    then return []
+    else (x :) <$> collectUntil act f
+
+readUntil :: (String -> Bool) -> IO [String]
+readUntil = collectUntil getLine
 
 -- Affichage de l'aide
 help :: IO ()
