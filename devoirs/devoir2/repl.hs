@@ -11,13 +11,14 @@ import Text.Printf (printf)
 -- de pouvoir évaluer le terme qui en découle. De plus, le programme maintient à jour
 -- un environnement global.
 -- Auteurs: Jonathan Friedli et Valentin Kaelin
--- Date de dernière modification: 06 juin 2022
+-- Date de dernière modification: 17 juin 2022
 
 -- Environnement
 data State
   = ValidState TEnv Env
-  | InvalidState TEnv Env String
+  | MessageState TEnv Env String
 
+-- Initialise le state avec un environnement vide
 initEnv :: State
 initEnv = ValidState [] []
 
@@ -27,8 +28,14 @@ main = do
   putStrLn startingMessage
   repl initEnv
 
+-- Boucle de "Read-Eval-Print"
 repl :: State -> IO ()
-repl (InvalidState oldTEnv oldEnv msg) = putStrLn msg >> repl (ValidState oldTEnv oldEnv)
+repl (MessageState tEnv env msg) = do
+  catch (putStrLn msg) handler
+  repl (ValidState tEnv env)
+  where
+    handler :: SomeException -> IO ()
+    handler = print
 repl state@(ValidState tEnv env) = do
   line <- getLine
   case line of
@@ -36,47 +43,45 @@ repl state@(ValidState tEnv env) = do
     ":r" -> repl initEnv
     ":{" -> do
       content <- readUntil (== ":}")
-      applyLinePerLine content state
+      evaluateLineByLine content state
       where
-        applyLinePerLine [] state' = repl state'
-        applyLinePerLine (line : rest) state' = do
+        evaluateLineByLine [] state' = repl state'
+        evaluateLineByLine (line : rest) state' = do
           state'' <- applyEvaluate line state'
-          applyLinePerLine rest state''
-    (':' : 't' : ' ' : rest) -> tryTypeOf rest tEnv >> repl state
-    ":e" -> print env >> print tEnv >> repl state
+          evaluateLineByLine rest state''
+    (':' : 't' : ' ' : rest) -> repl (MessageState tEnv env (show $ snd (typeof (parseStmt rest) tEnv)))
+    ":e" -> repl (MessageState tEnv env (show env ++ "\n" ++ show tEnv))
     ":h" -> help >> repl state
     _ -> do
       state' <- applyEvaluate line state
       repl state'
 
+-- Applique l'évaluation sur une ligne
 applyEvaluate :: String -> State -> IO State
 applyEvaluate line state@(ValidState tEnv env) = do
   catch
     ( do
         stmt <- evaluate (parseStmt line)
         semantic@(tEnv', t) <- evaluate (typeof stmt tEnv)
-        -- astuce pour forcer l'évaluation du typeof avant le eval
+        -- astuce pour forcer l'évaluation du typeof avant celle de l'eval
         let tEnv'' = if t == Language.TUniversal then tEnv' else tEnv'
         case tEnv'' `seq` eval stmt env of
           Left env' -> return (ValidState tEnv'' env')
-          Right value -> print value >> return state
+          Right value -> return (MessageState tEnv env (show value))
     )
     handler
   where
     handler :: SomeException -> IO State
-    handler error = do
-      print error
-      return state
+    handler error = return (MessageState tEnv env (show error))
 applyEvaluate _ _ = error "applyEvaluate: impossible"
 
+-- Parse un statement
 parseStmt :: String -> Statement
 parseStmt stmt = parser $ lexer stmt
 
-tryTypeOf :: String -> TEnv -> IO ()
-tryTypeOf str tEnv = catch (print $ snd (typeof (parseStmt str) tEnv)) handler
-
-handler :: SomeException -> IO ()
-handler = print
+-- Lit les entrées utilisateur jusqu'à la validation de la condition
+readUntil :: (String -> Bool) -> IO [String]
+readUntil = collectUntil getLine
 
 -- Source: https://stackoverflow.com/a/49968517
 collectUntil :: (Monad m) => m a -> (a -> Bool) -> m [a]
@@ -86,10 +91,7 @@ collectUntil act f = do
     then return []
     else (x :) <$> collectUntil act f
 
-readUntil :: (String -> Bool) -> IO [String]
-readUntil = collectUntil getLine
-
--- Affichage de l'aide
+-- Affiche l'aide
 help :: IO ()
 help = do
   putStrLn "---------------------------------------------------------------------------------"
