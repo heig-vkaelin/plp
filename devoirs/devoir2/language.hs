@@ -1,5 +1,10 @@
 module Language where
 
+-- Types de notre langage de programmation fonctionnelle 
+-- utilisés lors des différentes étapes du projet.
+-- Auteurs: Jonathan Friedli et Valentin Kaelin
+-- Date de dernière modification: 13 juin 2022
+
 type Name = String
 
 type TEnv = [(Name, Type)]

@@ -1,12 +1,13 @@
--- Analyse syntaxique de notre language de programmation fonctionnelle réalisée grâce à la librairie Happy
--- Auteurs: Jonathan Friedli et Valentin Kaelin
--- Date dernière modification: 07 juin 2022
-
 {
 module Parser (parser) where
 import Language
 import Lexer
 }
+
+-- Analyse syntaxique de notre language de programmation fonctionnelle
+-- réalisée grâce à la librairie Happy
+-- Auteurs: Jonathan Friedli et Valentin Kaelin
+-- Date dernière modification: 13 juin 2022
 
 %name parser
 %tokentype { Token }

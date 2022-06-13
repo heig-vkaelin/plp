@@ -1,10 +1,11 @@
--- Lexer de notre langage de programmation fonctionnelle qui a pour but d'être utilisé par Alex
--- Auteurs: Jonathan Friedli et Valentin Kaelin
--- Date dernière modification: 07 juin 2022
-
 {
 module Lexer (lexer, Token(..)) where
 }
+
+-- Lexer de notre langage de programmation fonctionnelle 
+-- qui a pour but d'être utilisé par Alex
+-- Auteurs: Jonathan Friedli et Valentin Kaelin
+-- Date dernière modification: 13 juin 2022
 
 %wrapper "basic"
 

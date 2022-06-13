@@ -4,6 +4,14 @@ import Language
 import Lexer
 import Parser
 
+-- Intérpreteur de notre langage de programmation fonctionnelle
+-- mettant à disposition une fonction eval permettant d'évaluer
+-- les statements de notre langage. Cette fonction vérifie
+-- notamment que les variables utilisées dans les expressions
+-- sont bien définies.
+-- Auteurs: Jonathan Friedli et Valentin Kaelin
+-- Date de dernière modification: 17 juin 2022
+
 -- -----------------------
 -- Environment
 -- -----------------------
@@ -158,39 +166,3 @@ evalDef (Definition name args body) env =
   case args of
     [] -> (name, evalExpr body env) : env -- Variable et fonctions sans param
     _ -> (name, VFunc body args env) : env -- Fonctions avec params
-
--- pour tester:
--- eval (parser $ lexer "5") []
--- eval (parser $ lexer "x") [("x", VInt 5)]
--- eval (parser $ lexer "x + 3") [("x", VInt 5)]
--- eval (parser $ lexer "x / 2") [("x", VInt 6)]
--- eval (parser $ lexer "x / 0") [("x", VInt 6)]
-
--- eval (parser $ lexer "x == 6") [("x", VInt 6)]
--- eval (parser $ lexer "x != 6") [("x", VInt 6)]
-
--- eval (parser $ lexer "x == (6, 7)") [("x", VTuple (EValue (VInt 6)) (EValue (VInt 7)))]
--- eval (parser $ lexer "x == ((1, 2), (3, 4))") [("x", VTuple (EValue (VTuple (EValue (VInt 1)) (EValue (VInt 2)))) (EValue (VTuple (EValue (VInt 3)) (EValue (VInt 4)))))]
-
--- eval (parser $ lexer "(2, 3) == (6, 7)") []
--- eval (parser $ lexer "(2, 3) == (2, 3)") []
--- eval (parser $ lexer "x < 6") [("x", VInt 6)]
--- eval (parser $ lexer "x <= 6") [("x", VInt 6)]
--- eval (parser $ lexer "x && False") [("x", VBool True)]
--- eval (parser $ lexer "x && True") [("x", VBool True)]
-
--- eval (parser $ lexer "++x") [("x", VInt 3)]
--- eval (parser $ lexer "--x") [("x", VInt 3)]
--- eval (parser $ lexer "!x") [("x", VBool True)]
--- eval (parser $ lexer "!x") [("x", VBool False)]
-
--- eval (parser $ lexer "var x = 2") []
--- eval (parser $ lexer "func x (Integer y) = y * 2") []
-
--- eval (parser $ lexer $ "let func f(Integer x) = 2 * x in f(2)") []
--- eval (parser $ lexer $ "let func f() = 3 in 2 * f") []
--- eval (parser $ lexer "let func x () = 3 in 3 * 3") []
--- eval (parser $ lexer "let func x (Integer y) = 3 in 3 * 3") []
-
--- eval (parser $ lexer "case 3 * 3 of (6 -> 2) (_ -> 3) (_ -> 1)") []
--- eval (parser $ lexer "case 3 * 3 of (6 -> 2) (x -> 3) (_ -> 1)") [("x", VInt 9)]

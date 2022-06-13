@@ -5,6 +5,12 @@ import Language
 import Lexer
 import Parser
 
+-- Analyse sémantique de notre langage de programmation. La fonction typeof
+-- permet de déterminer le type d'un statement (expression ou définition).
+-- De plus, la fonction vérifie l'exactitude des types des expressions.
+-- Auteurs: Jonathan Friedli et Valentin Kaelin
+-- Date de dernière modification: 17 juin 2022
+
 -- -----------------------
 -- Environment
 -- -----------------------
@@ -122,31 +128,3 @@ typeofDef :: Definition -> [(Name, Type)] -> (TEnv, Type)
 typeofDef def@(Definition name args expr) env = (env', getType name env')
   where
     env' = addToEnv def env
-
--- Pour tester:
--- typeof (parser $ lexer $ "var x = True") []
--- typeof (parser $ lexer $ "func x (Integer y) = 3") []
--- typeof (parser $ lexer $ "func x (Integer y) = y * 3") []
--- typeof (parser $ lexer $ "func mult (Integer y, Integer z) = y * z") []
--- typeof (parser $ lexer $ "func equals (Integer y, Integer z) = y == z") []
-
--- typeof (parser $ lexer $ "(1, True)") []
--- typeof (parser $ lexer $ "(1, (True, 172))") []
-
--- typeof (parser $ lexer $ "let var x = 2 var y = 3 in x * y * 2") []
--- typeof (parser $ lexer $ "let var x = 2 var y = 3 in x == y") []
--- typeof (parser $ lexer $ "let var x = (1, True) var y = (3, False) in x == y") []
-
--- typeof (parser $ lexer $ "let func x (Integer z) = z + 2 var y = 3 in x(3) * y * 2") []
-
--- typeof (parser $ lexer $ "let func x () = 2 + 2 var y = 3 in z(3)") []
--- typeof (parser $ lexer $ "let func x () = 2 + 2 var y = 3 in x") []
--- typeof (parser $ lexer $ "let func x (Integer z) = z + 2 var y = 3 in x(3)") []
--- typeof (parser $ lexer $ "let func x (Integer z) = z + 2 var y = 3 in x(True)") []
-
--- typeof (parser $ lexer $ "case 3 * 3 of (6 -> True) (2 -> False) (x -> False)") [("x", TInteger)]
--- typeof (parser $ lexer $ "case 3 * 3 of (6 -> True) (2 -> False) (x -> False) (_ -> False)") [("x", TInteger)]
-
--- typeof (parser $ lexer $ "case 3 * 3 of (_ -> True) (3 -> False)") []
--- typeof (parser $ lexer $ "case 3 * 3 of (3 -> False) (_ -> True)") []
--- typeof (parser $ lexer $ "case 3 * 3 of (_ -> True)") []
