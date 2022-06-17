@@ -46,7 +46,7 @@ repl state@(ValidState tEnv env) = do
       state' <- applyEvaluate (concat content) state
       repl state'
     (':' : 't' : ' ' : rest) -> repl (MessageState tEnv env (show $ snd (typeof (parseStmt rest) tEnv)))
-    ":e" -> repl (MessageState tEnv env (show env ++ "\n" ++ show tEnv))
+    ":e" -> repl (MessageState tEnv env (show env))
     ":h" -> help >> repl state
     _ -> do
       state' <- applyEvaluate line state
@@ -63,7 +63,7 @@ applyEvaluate line state@(ValidState tEnv env) = do
         let tEnv'' = if t == Language.TUniversal then tEnv' else tEnv'
         case tEnv'' `seq` eval stmt env of
           Left env' -> return (ValidState tEnv'' env')
-          Right value -> return (MessageState tEnv env (show value))
+          Right value -> return (MessageState tEnv env (present value))
     )
     handler
   where
@@ -86,6 +86,18 @@ collectUntil act f = do
   if f x
     then return []
     else (x :) <$> collectUntil act f
+
+-- Affiche une valeur du langage de programmation sous forme simplifiée
+present :: Value -> String
+present (VInt i) = show i
+present (VBool b) = show b
+present (VTuple e1 e2) = "(" ++ presentExpr e1 ++ ", " ++ presentExpr e2 ++ ")"
+present x = show x
+
+-- Affiche que les valeurs sous forme simplifiée (notamment pour les tuples)
+presentExpr :: Expr -> String
+presentExpr (EValue v) = present v
+presentExpr x = show x
 
 -- Affiche l'aide
 help :: IO ()

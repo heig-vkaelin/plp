@@ -1,6 +1,6 @@
 module Language where
 
--- Types de notre langage de programmation fonctionnelle 
+-- Types de notre langage de programmation fonctionnelle
 -- utilisés lors des différentes étapes du projet.
 -- Auteurs: Jonathan Friedli et Valentin Kaelin
 -- Date de dernière modification: 13 juin 2022
@@ -57,14 +57,6 @@ data Value
   | VTuple Expr Expr
   | VFunc Expr [Arg] Env
   deriving (Show)
-
--- TODO
--- instance Show Value where
---   show (VInt i) = show i
---   show (VBool b) = show b
---   show (VTuple e1 e2) = "(" ++ show e1 ++ "," ++ show e2 ++ ")"
---   show (VFunc e args env) =
--- "(" ++ show e ++ " " ++ show args ++ " " ++ show env ++ ")"
 
 data Type
   = TBoolean
