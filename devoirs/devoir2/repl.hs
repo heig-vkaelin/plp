@@ -43,12 +43,8 @@ repl state@(ValidState tEnv env) = do
     ":r" -> repl initEnv
     ":{" -> do
       content <- readUntil (== ":}")
-      evaluateLineByLine content state
-      where
-        evaluateLineByLine [] state' = repl state'
-        evaluateLineByLine (line : rest) state' = do
-          state'' <- applyEvaluate line state'
-          evaluateLineByLine rest state''
+      state' <- applyEvaluate (concat content) state
+      repl state'
     (':' : 't' : ' ' : rest) -> repl (MessageState tEnv env (show $ snd (typeof (parseStmt rest) tEnv)))
     ":e" -> repl (MessageState tEnv env (show env ++ "\n" ++ show tEnv))
     ":h" -> help >> repl state
