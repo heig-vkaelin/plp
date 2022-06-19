@@ -53,8 +53,8 @@ import Lexer
 %right '&&'
 %nonassoc '==' '!=' '<=' '<' '>=' '>'
 %left '+' '-'
-%left '*' 'split' 'rest'
-%left '-' '!'
+%left '*' '/' '%'
+%left '-' '!' '++' '--'
 
 %%
 
@@ -100,7 +100,6 @@ FuncDef
 Type
       : 'integer'                                               { Language.TInteger }
       | 'boolean'                                               { Language.TBoolean }
-      -- | '(' Param ',' Param ')'                                 { Language.TTuple $2 $4 } -- TODO
 
 Params 
       : Param                                                   { [$1] }

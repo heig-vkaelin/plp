@@ -16,7 +16,6 @@ Int -> {Number}
 Alphanumeric -> Char | Int
 Bool -> True | False
 Universal -> _
-
 Tuple -> '(' Expr ',' Expr ')'
 
 
@@ -24,7 +23,7 @@ Tuple -> '(' Expr ',' Expr ')'
 -- Point d'entrée du programme
 -- -----------------------
 
-Statement -> {Expr | Def}
+Statement -> Expr | Def
 
 
 -- -----------------------
@@ -42,8 +41,9 @@ NameDef -> ['_']LetterLowercase{Alphanumeric}
 VarDef -> 'var' NameDef '=' Expr
 
 -- Définition de fonctions (non-récursives); 
-FuncDef -> 'func' NameDef '(' [Params] ')' '=' Expr
-Params -> Type NameDef | TypedTuple
+FuncDef -> 'func' NameDef '(' Params? ')' '=' Expr
+Params -> Param | Param ',' Params
+Param -> Type NameDef | TypedTuple
 Type -> 'Integer' | 'Boolean' | TypedTuple
 TypedTuple -> '(' Params ',' Params ')'
 
@@ -73,12 +73,12 @@ FuncApp -> NameDef '(' FuncArgs ')'
 FuncArgs -> Expr | FuncArgs ',' Expr
 
 -- Expressions let-in avec plusieurs définitions; 
-LetIn -> 'let' {Def} 'in' Expr
+LetIn -> 'let' Defs 'in' Expr
 
 -- Case-of sans gardes avec motifs universel, variable, littéraux;
 -- Note: les variables dans les patternes doivent être déclarées avant le case, contrairement à Haskell par exemple
 CaseOf -> 'case' Expr 'of' CaseOfPatterns
-CaseOfPatterns -> {'(' Pattern  '->' Expr ')'}
+CaseOfPatterns -> {'(' Pattern '->' Expr ')'}
 Pattern -> Value | Var | Universal
 
 -- opérations unaires, binaires.
